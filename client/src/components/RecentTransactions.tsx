@@ -3,11 +3,12 @@ import { Link } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const RecentTransactions = () => {
-  const { data: transactions, isLoading } = useQuery({
+  const { data: transactions, isLoading } = useQuery<any[], any, any[]>({
     queryKey: ['/api/transactions'],
-    select: (data) => data?.slice(0, 6) || [], // Get only the first 6 transactions
+    select: (data) => (data && Array.isArray(data) ? data.slice(0, 6) : []), // Get only the first 6 transactions
   });
 
   if (isLoading) {
@@ -15,8 +16,8 @@ const RecentTransactions = () => {
       <Card className="bg-white rounded-lg shadow-sm overflow-hidden h-full">
         <CardHeader className="p-4 border-b border-gray-200 flex justify-between items-center">
           <CardTitle className="text-lg font-semibold text-gray-900">Recent Transactions</CardTitle>
-          <Link href="/transactions">
-            <a className="text-sm text-primary hover:text-blue-700">View All</a>
+          <Link href="/transactions" className="text-sm text-primary hover:text-blue-700">
+            View All
           </Link>
         </CardHeader>
         <CardContent className="p-2">
@@ -49,8 +50,8 @@ const RecentTransactions = () => {
       <Card className="bg-white rounded-lg shadow-sm overflow-hidden h-full">
         <CardHeader className="p-4 border-b border-gray-200 flex justify-between items-center">
           <CardTitle className="text-lg font-semibold text-gray-900">Recent Transactions</CardTitle>
-          <Link href="/transactions">
-            <a className="text-sm text-primary hover:text-blue-700">View All</a>
+          <Link href="/transactions" className="text-sm text-primary hover:text-blue-700">
+            View All
           </Link>
         </CardHeader>
         <CardContent className="p-6">
@@ -150,8 +151,8 @@ const RecentTransactions = () => {
     <Card className="bg-white rounded-lg shadow-sm overflow-hidden h-full">
       <CardHeader className="p-4 border-b border-gray-200 flex justify-between items-center">
         <CardTitle className="text-lg font-semibold text-gray-900">Recent Transactions</CardTitle>
-        <Link href="/transactions">
-          <a className="text-sm text-primary hover:text-blue-700">View All</a>
+        <Link href="/transactions" className="text-sm text-primary hover:text-blue-700">
+          View All
         </Link>
       </CardHeader>
       <CardContent className="p-2">

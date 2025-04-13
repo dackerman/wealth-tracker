@@ -27,7 +27,6 @@ import {
 // Import logos
 import logoPath from "@/assets/logo.png";
 import logoHorizontalPath from "@/assets/logo-horizontal.png";
-import logoWhitePath from "@/assets/logo-white.png";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -93,9 +92,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <img
-                  src={logoWhitePath}
+                  src={logoHorizontalPath}
                   alt="WealthVision Logo"
-                  className="h-12"
+                  className="h-32"
                 />
               </div>
               <div className="hidden sm:ml-8 sm:flex sm:space-x-6">
@@ -240,7 +239,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           id="mobile-menu"
         >
           <div className="px-4 py-2 border-t border-[var(--wealth-teal)] flex justify-center">
-            <img src={logoWhitePath} alt="WealthVision Logo" className="h-10" />
+            <img src={logoPath} alt="WealthVision Logo" className="h-10 w-10" />
           </div>
           <div className="pb-3 space-y-0.5">
             <Link

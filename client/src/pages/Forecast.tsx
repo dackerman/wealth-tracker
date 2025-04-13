@@ -529,6 +529,14 @@ export default function ForecastPage() {
   return (
     <MainLayout>
       <div className="space-y-8">
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--wealth-dark-teal)]">
+            Retirement Forecast
+          </h1>
+          <p className="text-muted-foreground">
+            Plan for your future by forecasting your retirement needs and timeline.
+          </p>
+        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-between items-center mb-4">

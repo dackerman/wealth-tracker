@@ -10,9 +10,22 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatCurrency(
   amount: number | string,
-  currency: string = "USD",
-  locale: string = "en-US"
+  options?: {
+    currency?: string;
+    locale?: string;
+    notation?: 'standard' | 'scientific' | 'engineering' | 'compact';
+    minimumFractionDigits?: number;
+    maximumFractionDigits?: number;
+  }
 ): string {
+  const {
+    currency = "USD",
+    locale = "en-US",
+    notation = "standard",
+    minimumFractionDigits = 2,
+    maximumFractionDigits = 2
+  } = options || {};
+  
   const numberAmount = typeof amount === "string" ? parseFloat(amount) : amount;
   
   if (isNaN(numberAmount)) {
@@ -22,8 +35,9 @@ export function formatCurrency(
   return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    notation,
+    minimumFractionDigits,
+    maximumFractionDigits,
   }).format(numberAmount);
 }
 

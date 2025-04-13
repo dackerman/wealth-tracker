@@ -851,11 +851,9 @@ export default function ForecastPage() {
                                   </div>
                                   <div className="flex items-center text-muted-foreground">
                                     <DollarSign className="h-3 w-3 mr-1" />
-                                    {new Intl.NumberFormat('en-US', {
-                                      style: 'currency',
-                                      currency: 'USD',
-                                      notation: 'compact'
-                                    }).format(scenario.formValues.currentSavings)}
+                                    {formatCurrency(scenario.formValues.currentSavings, { 
+                                      notation: 'compact' 
+                                    })}
                                   </div>
                                   <div className="flex items-center text-muted-foreground">
                                     <CalendarDays className="h-3 w-3 mr-1" />

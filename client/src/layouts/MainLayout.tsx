@@ -95,7 +95,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <img
                   src={logoMatrixPath}
                   alt="WealthVision Logo"
-                  className="h-12"
+                  className="h-32"
                 />
               </div>
               <div className="hidden sm:ml-8 sm:flex sm:space-x-6">
@@ -240,7 +240,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           id="mobile-menu"
         >
           <div className="px-4 py-2 border-t border-[var(--wealth-teal)] flex justify-center">
-            <img src={logoMatrixPath} alt="WealthVision Logo" className="h-10" />
+            <img
+              src={logoMatrixPath}
+              alt="WealthVision Logo"
+              className="h-10"
+            />
           </div>
           <div className="pb-3 space-y-0.5">
             <Link

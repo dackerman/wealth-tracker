@@ -12,6 +12,7 @@ import {
 } from "./plaid";
 import { insertAccountSchema, insertInstitutionSchema, insertTransactionSchema } from "@shared/schema";
 import { setupAuth } from "./auth";
+import { updateNetWorth, startBackgroundJobs } from "./jobs";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -603,6 +604,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
       throw error;
     }
   }
+
+  // Manual job trigger endpoints for testing (admin-only)
+  app.post("/api/admin/jobs/sync-plaid-data", requireAuth, async (req, res) => {
+    try {
+      // For security, only allow userId 1 (admin) to trigger jobs manually
+      if (req.body.userId !== 1) {
+        return res.status(403).json({ error: "Not authorized to run admin jobs" });
+      }
+
+      const jobs = startBackgroundJobs();
+      const result = await jobs.syncPlaidData();
+      
+      res.json({ 
+        success: true, 
+        message: "Manual Plaid data sync completed successfully",
+        result
+      });
+    } catch (error: any) {
+      console.error("Error running manual Plaid sync:", error);
+      res.status(500).json({ error: error.message || "Failed to run manual Plaid sync" });
+    }
+  });
+
+  app.post("/api/admin/jobs/update-net-worth", requireAuth, async (req, res) => {
+    try {
+      // For security, only allow userId 1 (admin) to trigger jobs manually
+      if (req.body.userId !== 1) {
+        return res.status(403).json({ error: "Not authorized to run admin jobs" });
+      }
+
+      const result = await updateNetWorth(req.body.userId);
+      
+      res.json({ 
+        success: true, 
+        message: "Manual net worth update completed successfully",
+        result 
+      });
+    } catch (error: any) {
+      console.error("Error running manual net worth update:", error);
+      res.status(500).json({ error: error.message || "Failed to run manual net worth update" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

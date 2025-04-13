@@ -503,13 +503,18 @@ export default function ForecastPage() {
     // Only calculate if we have valid data
     if (Object.keys(form.formState.errors).length === 0) {
       try {
-        const calculatedData = calculateForecastData(watchedValues);
-        setForecastData(calculatedData);
+        // Debounce the calculation to prevent infinite loop
+        const timeoutId = setTimeout(() => {
+          const calculatedData = calculateForecastData(watchedValues);
+          setForecastData(calculatedData);
+        }, 100);
+        
+        return () => clearTimeout(timeoutId);
       } catch (error) {
         console.error("Calculation error:", error);
       }
     }
-  }, [watchedValues, form.formState.errors]);
+  }, [JSON.stringify(watchedValues), form.formState.errors]);
 
   const onSubmit = (data: ForecastFormValues) => {
     const calculatedData = calculateForecastData(data);
@@ -524,14 +529,6 @@ export default function ForecastPage() {
   return (
     <MainLayout>
       <div className="space-y-8">
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight text-[var(--wealth-dark-teal)]">
-            Retirement Forecast
-          </h1>
-          <p className="text-muted-foreground">
-            Plan for your future by forecasting your retirement needs and timeline.
-          </p>
-        </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <div className="flex justify-between items-center mb-4">

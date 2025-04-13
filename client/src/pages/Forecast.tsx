@@ -369,12 +369,104 @@ export default function ForecastPage() {
   const [scenarioName, setScenarioName] = useState("");
   const [scenarioDescription, setScenarioDescription] = useState("");
   const [isComparisonMode, setIsComparisonMode] = useState(false);
-
+  const [editingScenarioId, setEditingScenarioId] = useState<string | null>(null);
+  
   // Define the form with default values first
   const form = useForm<ForecastFormValues>({
     resolver: zodResolver(forecastFormSchema),
     defaultValues,
   });
+  
+  // Generate a unique ID
+  const generateId = useCallback(() => {
+    return Math.random().toString(36).substring(2, 9);
+  }, []);
+  
+  // Handle saving a new scenario
+  const saveScenario = () => {
+    if (!scenarioName.trim()) {
+      return; // Don't save without a name
+    }
+    
+    const scenarioData = {
+      id: editingScenarioId || generateId(),
+      name: scenarioName.trim(),
+      description: scenarioDescription.trim() || undefined,
+      formValues: {...form.getValues()},
+      calculatedData: forecastData,
+      color: editingScenarioId 
+        ? scenarios.find(s => s.id === editingScenarioId)?.color || scenarioColors[scenarios.length % scenarioColors.length]
+        : scenarioColors[scenarios.length % scenarioColors.length],
+      createdAt: new Date()
+    };
+    
+    if (editingScenarioId) {
+      // Update existing scenario
+      setScenarios(prev => 
+        prev.map(s => s.id === editingScenarioId ? scenarioData : s)
+      );
+    } else {
+      // Add new scenario
+      setScenarios(prev => [...prev, scenarioData]);
+    }
+    
+    // Reset form
+    setScenarioName("");
+    setScenarioDescription("");
+    setIsScenarioModalOpen(false);
+    setEditingScenarioId(null);
+  };
+  
+  // Delete a scenario
+  const deleteScenario = (id: string) => {
+    setScenarios(prev => prev.filter(s => s.id !== id));
+    
+    // If we're deleting the active scenario, clear the active scenario
+    if (activeScenarioId === id) {
+      setActiveScenarioId(null);
+    }
+  };
+  
+  // Load a scenario
+  const loadScenario = (id: string) => {
+    const scenario = scenarios.find(s => s.id === id);
+    if (!scenario) return;
+    
+    // Set form values
+    Object.entries(scenario.formValues).forEach(([key, value]) => {
+      form.setValue(key as any, value);
+    });
+    
+    setActiveScenarioId(id);
+    setIsComparisonMode(false);
+  };
+  
+  // Initialize editing a scenario
+  const editScenario = (id: string) => {
+    const scenario = scenarios.find(s => s.id === id);
+    if (!scenario) return;
+    
+    setScenarioName(scenario.name);
+    setScenarioDescription(scenario.description || "");
+    setEditingScenarioId(id);
+    setIsScenarioModalOpen(true);
+  };
+  
+  // Create a copy of a scenario
+  const duplicateScenario = (id: string) => {
+    const scenario = scenarios.find(s => s.id === id);
+    if (!scenario) return;
+    
+    const newScenario = {
+      ...scenario,
+      id: generateId(),
+      name: `${scenario.name} (Copy)`,
+      createdAt: new Date(),
+      color: scenarioColors[(scenarios.length + 1) % scenarioColors.length]
+    };
+    
+    setScenarios(prev => [...prev, newScenario]);
+  };
   
   // Get user's current net worth
   const { data: netWorthSummary } = useQuery<NetWorthSummary>({
@@ -426,14 +518,90 @@ export default function ForecastPage() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full md:w-[400px] grid-cols-2">
-            <TabsTrigger value="calculator">
-              Calculator
-            </TabsTrigger>
-            <TabsTrigger value="results" disabled={!forecastData}>
-              Results & Insights
-            </TabsTrigger>
-          </TabsList>
+          <div className="flex justify-between items-center mb-4">
+            <TabsList className="grid w-full md:w-[400px] grid-cols-2">
+              <TabsTrigger value="calculator">
+                Calculator
+              </TabsTrigger>
+              <TabsTrigger value="results" disabled={!forecastData}>
+                Results & Insights
+              </TabsTrigger>
+            </TabsList>
+            
+            {forecastData && (
+              <div className="flex items-center gap-2">
+                <Dialog open={isScenarioModalOpen} onOpenChange={setIsScenarioModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="flex items-center gap-1"
+                      onClick={() => {
+                        setScenarioName("");
+                        setScenarioDescription("");
+                        setEditingScenarioId(null);
+                      }}
+                    >
+                      <PlusCircle className="h-4 w-4" />
+                      <span className="hidden md:inline">Save Scenario</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>{editingScenarioId ? "Edit Scenario" : "Save Retirement Scenario"}</DialogTitle>
+                      <DialogDescription>
+                        Save your current retirement plan settings as a named scenario for future reference or comparison.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <label htmlFor="scenario-name" className="text-sm font-medium">
+                          Scenario Name
+                        </label>
+                        <Input
+                          id="scenario-name"
+                          placeholder="e.g., Baseline Plan, Early Retirement, etc."
+                          value={scenarioName}
+                          onChange={(e) => setScenarioName(e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label htmlFor="scenario-description" className="text-sm font-medium">
+                          Description (Optional)
+                        </label>
+                        <Input
+                          id="scenario-description"
+                          placeholder="Brief description of this scenario"
+                          value={scenarioDescription}
+                          onChange={(e) => setScenarioDescription(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsScenarioModalOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={saveScenario} disabled={!scenarioName.trim()}>
+                        {editingScenarioId ? "Update Scenario" : "Save Scenario"}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+                
+                {scenarios.length >= 2 && (
+                  <Button
+                    variant={isComparisonMode ? "default" : "outline"}
+                    size="sm"
+                    className="flex items-center gap-1"
+                    onClick={() => setIsComparisonMode(!isComparisonMode)}
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                    <span className="hidden md:inline">Compare</span>
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
 
           <TabsContent value="calculator" className="mt-4">
             <div className="grid gap-8 md:grid-cols-2">
@@ -637,6 +805,155 @@ export default function ForecastPage() {
               </div>
 
               <div className="space-y-6">
+                {scenarios.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Saved Scenarios</CardTitle>
+                      <CardDescription>
+                        Manage your retirement scenarios
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {scenarios.map((scenario) => (
+                          <div 
+                            key={scenario.id}
+                            className={`relative p-3 rounded-md border transition-all hover:bg-accent/50 ${
+                              activeScenarioId === scenario.id ? 'bg-accent border-primary/40' : ''
+                            }`}
+                          >
+                            <div className="flex gap-3 items-center">
+                              <div 
+                                className="w-3 h-3 rounded-full flex-shrink-0" 
+                                style={{ backgroundColor: scenario.color }}
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="font-medium truncate">{scenario.name}</div>
+                                {scenario.description && (
+                                  <div className="text-xs text-muted-foreground truncate">{scenario.description}</div>
+                                )}
+                                <div className="flex items-center mt-1 gap-4 text-xs">
+                                  <div className="text-muted-foreground">
+                                    {formatDate(scenario.createdAt, { dateStyle: 'medium' })}
+                                  </div>
+                                  <div className="flex items-center text-muted-foreground">
+                                    <DollarSign className="h-3 w-3 mr-1" />
+                                    {formatCurrency(scenario.formValues.currentSavings, { notation: 'compact' })}
+                                  </div>
+                                  <div className="flex items-center text-muted-foreground">
+                                    <CalendarDays className="h-3 w-3 mr-1" />
+                                    Age {scenario.formValues.retirementAge}
+                                  </div>
+                                </div>
+                              </div>
+                              
+                              <div className="flex items-center gap-1">
+                                <UITooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-8 w-8"
+                                      onClick={() => loadScenario(scenario.id)}
+                                    >
+                                      <FileSearch className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Load Scenario</p>
+                                  </TooltipContent>
+                                </UITooltip>
+
+                                <UITooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-8 w-8"
+                                      onClick={() => editScenario(scenario.id)}
+                                    >
+                                      <Edit2 className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Edit Scenario</p>
+                                  </TooltipContent>
+                                </UITooltip>
+
+                                <UITooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button 
+                                      variant="ghost" 
+                                      size="icon" 
+                                      className="h-8 w-8"
+                                      onClick={() => duplicateScenario(scenario.id)}
+                                    >
+                                      <Copy className="h-4 w-4" />
+                                    </Button>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Duplicate Scenario</p>
+                                  </TooltipContent>
+                                </UITooltip>
+
+                                <UITooltip>
+                                  <TooltipTrigger asChild>
+                                    <AlertDialog>
+                                      <AlertDialogTrigger asChild>
+                                        <Button 
+                                          variant="ghost" 
+                                          size="icon" 
+                                          className="h-8 w-8"
+                                        >
+                                          <Trash2 className="h-4 w-4 text-red-500" />
+                                        </Button>
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Delete scenario?</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            This will permanently delete the &quot;{scenario.name}&quot; scenario. 
+                                            This action cannot be undone.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction 
+                                            onClick={() => deleteScenario(scenario.id)}
+                                            className="bg-red-500 hover:bg-red-600"
+                                          >
+                                            Delete
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </TooltipTrigger>
+                                  <TooltipContent>
+                                    <p>Delete Scenario</p>
+                                  </TooltipContent>
+                                </UITooltip>
+                              </div>
+                            </div>
+                            {isComparisonMode && (
+                              <Checkbox 
+                                className="absolute right-1 top-1"
+                                checked={activeScenarioId === scenario.id}
+                                onCheckedChange={(checked) => {
+                                  if (checked) {
+                                    setActiveScenarioId(scenario.id);
+                                  } else {
+                                    setActiveScenarioId(null);
+                                  }
+                                }}
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
                 <Card className="bg-[var(--wealth-light-blue-bg)] border-none">
                   <CardHeader>
                     <CardTitle className="flex items-center">
@@ -761,57 +1078,152 @@ export default function ForecastPage() {
                     <CardContent>
                       <div className="h-[400px] w-full mt-4">
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart
-                            data={forecastData.chartData}
-                            margin={{
-                              top: 5,
-                              right: 30,
-                              left: 20,
-                              bottom: 5,
-                            }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis 
-                              dataKey="age" 
-                              label={{ value: 'Age', position: 'insideBottomRight', offset: 0 }}
-                            />
-                            <YAxis 
-                              tickFormatter={(value) => `${new Intl.NumberFormat('en-US', {
-                                notation: 'compact',
-                                compactDisplay: 'short',
-                                maximumFractionDigits: 1,
-                              }).format(value)}`}
-                              label={{ value: 'Amount ($)', angle: -90, position: 'insideLeft' }}
-                            />
-                            <Tooltip 
-                              formatter={(value: number) => formatCurrency(value)}
-                              labelFormatter={(label) => `Age: ${label}`}
-                            />
-                            <Legend />
-                            <ReferenceLine 
-                              x={watchedValues.retirementAge} 
-                              label="Retirement" 
-                              stroke="#ff7300" 
-                              strokeDasharray="3 3" 
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="target" 
-                              name="Target Needed" 
-                              stroke="#8884d8" 
-                              fill="#8884d8" 
-                              fillOpacity={0.1}
-                              activeDot={{ r: 8 }}
-                            />
-                            <Area 
-                              type="monotone" 
-                              dataKey="savings" 
-                              name="Projected Savings" 
-                              stroke="#82ca9d" 
-                              fill="#82ca9d" 
-                              fillOpacity={0.6}
-                            />
-                          </AreaChart>
+                          {isComparisonMode ? (
+                            <LineChart
+                              margin={{
+                                top: 5,
+                                right: 30,
+                                left: 20,
+                                bottom: 5,
+                              }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis 
+                                dataKey="age" 
+                                type="number"
+                                domain={['dataMin', 'dataMax']}
+                                label={{ value: 'Age', position: 'insideBottomRight', offset: 0 }}
+                              />
+                              <YAxis 
+                                tickFormatter={(value) => `${new Intl.NumberFormat('en-US', {
+                                  notation: 'compact',
+                                  compactDisplay: 'short',
+                                  maximumFractionDigits: 1,
+                                }).format(value)}`}
+                                label={{ value: 'Amount ($)', angle: -90, position: 'insideLeft' }}
+                              />
+                              <ChartTooltip 
+                                formatter={(value: number) => formatCurrency(value)}
+                                labelFormatter={(label: any) => `Age: ${label}`}
+                              />
+                              <Legend />
+                              
+                              {/* Display data for selected scenario */}
+                              {scenarios.filter(s => activeScenarioId === s.id).map((scenario) => (
+                                <React.Fragment key={scenario.id}>
+                                  {/* Reference line for retirement age */}
+                                  <ReferenceLine 
+                                    x={scenario.formValues.retirementAge} 
+                                    label={`${scenario.name} Retirement`} 
+                                    stroke={scenario.color} 
+                                    strokeDasharray="3 3" 
+                                  />
+                                  
+                                  {/* Target Line */}
+                                  <Line 
+                                    data={scenario.calculatedData.chartData}
+                                    type="monotone" 
+                                    dataKey="target" 
+                                    name={`${scenario.name} - Target`} 
+                                    stroke={scenario.color} 
+                                    strokeDasharray="5 5"
+                                    dot={false}
+                                    activeDot={{ r: 8 }}
+                                  />
+                                  
+                                  {/* Savings Line */}
+                                  <Line 
+                                    data={scenario.calculatedData.chartData}
+                                    type="monotone" 
+                                    dataKey="savings" 
+                                    name={`${scenario.name} - Savings`} 
+                                    stroke={scenario.color} 
+                                    strokeWidth={2}
+                                    dot={false}
+                                  />
+                                </React.Fragment>
+                              ))}
+                              
+                              {/* Current Scenario */}
+                              <ReferenceLine 
+                                x={watchedValues.retirementAge} 
+                                label="Current Scenario Retirement" 
+                                stroke="#ff7300" 
+                                strokeDasharray="3 3" 
+                              />
+                              <Line 
+                                data={forecastData.chartData}
+                                type="monotone" 
+                                dataKey="target" 
+                                name="Current - Target" 
+                                stroke="#8884d8" 
+                                strokeDasharray="5 5"
+                                dot={false}
+                                activeDot={{ r: 8 }}
+                              />
+                              <Line 
+                                data={forecastData.chartData}
+                                type="monotone" 
+                                dataKey="savings" 
+                                name="Current - Savings" 
+                                stroke="#82ca9d" 
+                                strokeWidth={2}
+                                dot={false}
+                              />
+                            </LineChart>
+                          ) : (
+                            <AreaChart
+                              data={forecastData.chartData}
+                              margin={{
+                                top: 5,
+                                right: 30,
+                                left: 20,
+                                bottom: 5,
+                              }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" />
+                              <XAxis 
+                                dataKey="age" 
+                                label={{ value: 'Age', position: 'insideBottomRight', offset: 0 }}
+                              />
+                              <YAxis 
+                                tickFormatter={(value) => `${new Intl.NumberFormat('en-US', {
+                                  notation: 'compact',
+                                  compactDisplay: 'short',
+                                  maximumFractionDigits: 1,
+                                }).format(value)}`}
+                                label={{ value: 'Amount ($)', angle: -90, position: 'insideLeft' }}
+                              />
+                              <ChartTooltip 
+                                formatter={(value: number) => formatCurrency(value)}
+                                labelFormatter={(label: any) => `Age: ${label}`}
+                              />
+                              <Legend />
+                              <ReferenceLine 
+                                x={watchedValues.retirementAge} 
+                                label="Retirement" 
+                                stroke="#ff7300" 
+                                strokeDasharray="3 3" 
+                              />
+                              <Area 
+                                type="monotone" 
+                                dataKey="target" 
+                                name="Target Needed" 
+                                stroke="#8884d8" 
+                                fill="#8884d8" 
+                                fillOpacity={0.1}
+                                activeDot={{ r: 8 }}
+                              />
+                              <Area 
+                                type="monotone" 
+                                dataKey="savings" 
+                                name="Projected Savings" 
+                                stroke="#82ca9d" 
+                                fill="#82ca9d" 
+                                fillOpacity={0.6}
+                              />
+                            </AreaChart>
+                          )}
                         </ResponsiveContainer>
                       </div>
 

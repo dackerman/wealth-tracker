@@ -92,14 +92,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Desktop Header */}
       <nav className="wealth-gradient-bg text-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-32">
+          <div className="flex justify-between h-24">
             {/* Logo section - visible on all screens */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <img
                   src={logoMatrixPath}
                   alt="WealthVision Logo"
-                  className="h-28"
+                  className="h-20"
                 />
               </div>
               
@@ -234,13 +234,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}
           id="mobile-menu"
         >
-          <div className="px-2 py-2 border-t border-[var(--wealth-teal)]">
+          <div className="px-2 py-1 border-t border-[var(--wealth-teal)]">
             {/* Mobile Logo Section */}
-            <div className="flex justify-center py-0">
+            <div className="flex justify-center py-0 mt-0">
               <img
                 src={logoMatrixPath}
                 alt="WealthVision Logo"
-                className="h-36"
+                className="h-24"
               />
             </div>
             
@@ -307,7 +307,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </Link>
 
             {/* Actions Section */}
-            <div className="border-t border-[var(--wealth-teal)]/50 pt-2 mt-2">
+            <div className="border-t border-[var(--wealth-teal)]/50 pt-1 mt-1">
               <button
                 onClick={openModal}
                 className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-1 border-l-4 text-base font-medium"

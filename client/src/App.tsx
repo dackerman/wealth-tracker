@@ -7,15 +7,19 @@ import Dashboard from "@/pages/Dashboard";
 import Accounts from "@/pages/Accounts";
 import Transactions from "@/pages/Transactions";
 import Goals from "@/pages/Goals";
+import AuthPage from "@/pages/auth-page";
 import MainLayout from "@/layouts/MainLayout";
+import { ProtectedRoute } from "./lib/protected-route";
+import { AuthProvider } from "./hooks/use-auth";
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Dashboard} />
-      <Route path="/accounts" component={Accounts} />
-      <Route path="/transactions" component={Transactions} />
-      <Route path="/goals" component={Goals} />
+      <ProtectedRoute path="/" component={Dashboard} />
+      <ProtectedRoute path="/accounts" component={Accounts} />
+      <ProtectedRoute path="/transactions" component={Transactions} />
+      <ProtectedRoute path="/goals" component={Goals} />
+      <Route path="/auth" component={AuthPage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -24,10 +28,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <MainLayout>
-        <Router />
-      </MainLayout>
-      <Toaster />
+      <AuthProvider>
+        <MainLayout>
+          <Router />
+        </MainLayout>
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

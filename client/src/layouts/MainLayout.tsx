@@ -1,12 +1,21 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 import AddAccountModal from "@/components/AddAccountModal";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MobileMenu } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { Menu, ChevronDown } from "lucide-react";
+import { Menu, LogOut, UserCircle } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -15,6 +24,7 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   const [location] = useLocation();
   const { toast } = useToast();
+  const { user, logoutMutation } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -48,10 +58,19 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     refreshMutation.mutate();
   };
 
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+
+  // If we're on the auth page or there's no user, don't show the layout
+  if (location === "/auth" || !user) {
+    return <>{children}</>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -102,12 +121,41 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 </svg>
                 <span className="sr-only">Refresh data</span>
               </button>
-              <Button onClick={openModal} className="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium">
+              
+              <Button onClick={openModal} variant="default" className="mr-3">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-1">
                   <path d="M12 5v14M5 12h14" />
                 </svg>
                 Add Account
               </Button>
+              
+              {/* User menu dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <UserCircle className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.username}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        User Profile
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="text-red-600 cursor-pointer"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
               <button 
                 onClick={toggleMobileMenu} 
                 className="ml-4 sm:hidden p-1 rounded-full text-gray-500 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
@@ -141,6 +189,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 Goals
               </a>
             </Link>
+            <button
+              onClick={handleLogout}
+              className="border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 block pl-3 pr-4 py-2 border-l-4 text-base font-medium w-full text-left flex items-center"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Log Out
+            </button>
           </div>
         </div>
       </nav>

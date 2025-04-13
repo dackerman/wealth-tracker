@@ -69,7 +69,7 @@ app.use((req, res, next) => {
     log(`serving on port ${port}`);
     
     // Start background jobs
-    const jobs = startBackgroundJobs();
-    log(`Background jobs scheduled: ${Object.keys(jobs).join(', ')}`);
+    startBackgroundJobs();
+    log("Background jobs scheduled successfully");
   });
 })();

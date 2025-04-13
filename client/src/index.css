@@ -1,13 +1,56 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --wealth-dark-teal: #1A3C40;
+    --wealth-teal: #177B7D;
+    --wealth-light-teal: #3ACEC2;
+    --wealth-off-white: #F5F7F7;
+    --wealth-light-gray: #E0E7E9;
+    --wealth-slate: #334155;
+    --wealth-dark-slate: #1E293B;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
   }
+}
+
+/* Custom accent classes */
+.wealth-gradient-bg {
+  background: linear-gradient(135deg, var(--wealth-teal), var(--wealth-dark-teal));
+}
+
+.wealth-gradient-text {
+  background: linear-gradient(135deg, var(--wealth-light-teal), var(--wealth-teal));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.wealth-card {
+  @apply bg-card rounded-lg border shadow-sm p-6 transition-all duration-200;
+}
+
+.wealth-card:hover {
+  @apply shadow-md;
+}
+
+/* Custom chart styles */
+.recharts-tooltip-wrapper {
+  @apply !shadow-lg;
+}
+
+/* Button Overrides */
+.btn-primary {
+  @apply bg-primary hover:bg-primary/90 text-primary-foreground;
 }

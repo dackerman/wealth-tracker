@@ -91,11 +91,11 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     <div className="min-h-screen bg-[var(--wealth-off-white)]">
       {/* Desktop Header */}
       <nav className="wealth-gradient-bg text-white shadow-md">
-        <div className="max-w-7xl mx-auto px-0 sm:px-1 lg:px-2">
-          <div className="flex justify-between h-44">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between h-16">
             {/* Logo section - visible on all screens */}
             <div className="flex items-center">
-              <div className="flex-shrink-0 flex items-center pl-0 ml-0">
+              <div className="flex-shrink-0 flex items-center">
                 <img
                   src={logoMatrixPath}
                   alt="WealthVision Logo"

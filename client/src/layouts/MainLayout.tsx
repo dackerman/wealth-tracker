@@ -309,6 +309,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <Target className="w-4 h-4 mr-2" />
               Goals
             </Link>
+            <Link
+              href="/forecast"
+              className={`${
+                location === "/forecast"
+                  ? "bg-[var(--wealth-teal)] border-[var(--wealth-light-teal)] text-white"
+                  : "border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white"
+              } block pl-3 pr-4 py-1 border-l-4 text-base font-medium flex items-center`}
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Forecast
+            </Link>
 
             {/* Actions Section */}
             <div className="border-t border-[var(--wealth-teal)]/50 pt-1 mt-1">

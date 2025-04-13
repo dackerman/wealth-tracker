@@ -294,23 +294,24 @@ function PercentageInput({
   );
 }
 
+// Define the NetWorthSummary interface
+interface NetWorthSummary {
+  netWorth: string;
+  totalAssets: string;
+  totalLiabilities: string;
+}
+
 export default function ForecastPage() {
   const [forecastData, setForecastData] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState("calculator");
 
-  // Define the form with default values
+  // Define the form with default values first
   const form = useForm<ForecastFormValues>({
     resolver: zodResolver(forecastFormSchema),
     defaultValues,
   });
-
-  // Get user's current net worth
-  interface NetWorthSummary {
-    netWorth: string;
-    totalAssets: string;
-    totalLiabilities: string;
-  }
   
+  // Get user's current net worth
   const { data: netWorthSummary } = useQuery<NetWorthSummary>({
     queryKey: ['/api/net-worth/summary'],
   });
@@ -320,7 +321,7 @@ export default function ForecastPage() {
     if (netWorthSummary?.totalAssets) {
       form.setValue('currentSavings', parseFloat(netWorthSummary.totalAssets));
     }
-  }, [netWorthSummary, form]);
+  }, [netWorthSummary]);
 
   const watchedValues = form.watch();
 

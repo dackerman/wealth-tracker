@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-import { usePlaid } from "@/App";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -25,38 +24,32 @@ const PlaidLinkButton = ({
   children?: React.ReactNode,
   disabled?: boolean
 }) => {
-  const { linkToken, setLinkToken } = usePlaid();
+  const [isPlaidLoaded, setIsPlaidLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Load the Plaid Link script if it hasn't been loaded already
+  // Load the Plaid Link script
   useEffect(() => {
     if (!document.getElementById("plaid-link-script")) {
       const script = document.createElement("script");
       script.src = "https://cdn.plaid.com/link/v2/stable/link-initialize.js";
       script.id = "plaid-link-script";
       script.async = true;
+      script.onload = () => {
+        console.log("Plaid script loaded");
+        setIsPlaidLoaded(true);
+      };
       document.body.appendChild(script);
+    } else {
+      // Script already exists, check if Plaid is defined
+      if (window.Plaid) {
+        setIsPlaidLoaded(true);
+      }
     }
   }, []);
 
-  // Fetch a link token when the component mounts
-  const { refetch: fetchLinkToken } = useQuery({
-    queryKey: ['/api/plaid/create-link-token'],
-    enabled: false,
-    onSuccess: (data) => {
-      setLinkToken(data.linkToken);
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error creating link token",
-        description: error.message || "Please try again later",
-        variant: "destructive",
-      });
-    },
-  });
-
-  // Handle exchanging the public token after Plaid Link flow completion
+  // Handle exchanging the public token for an access token
   const exchangeTokenMutation = useMutation({
     mutationFn: async (data: { publicToken: string, institutionId: string, institutionName: string }) => {
       return apiRequest('POST', '/api/plaid/exchange-public-token', data);
@@ -84,14 +77,7 @@ const PlaidLinkButton = ({
   });
 
   const openPlaidLink = async () => {
-    // If we don't have a link token, fetch one
-    if (!linkToken) {
-      await fetchLinkToken();
-      return;
-    }
-
-    // Check if Plaid is loaded
-    if (!window.Plaid) {
+    if (!isPlaidLoaded) {
       toast({
         title: "Plaid is still loading",
         description: "Please try again in a moment",
@@ -100,40 +86,60 @@ const PlaidLinkButton = ({
       return;
     }
 
+    setIsLoading(true);
+
     try {
+      // Get a link token from our server
+      const response = await fetch('/api/plaid/create-link-token');
+      if (!response.ok) {
+        throw new Error('Failed to create link token');
+      }
+      
+      const { linkToken } = await response.json();
+      console.log("Link token received:", linkToken);
+      
+      if (!linkToken) {
+        throw new Error('No link token received');
+      }
+      
+      // Initialize Plaid Link
       const handler = window.Plaid.create({
         token: linkToken,
-        onSuccess: (public_token: string, metadata: any) => {
+        onSuccess: (publicToken: string, metadata: any) => {
+          console.log("Plaid Link success", publicToken, metadata);
           // Exchange the public token for an access token
           exchangeTokenMutation.mutate({
-            publicToken: public_token,
+            publicToken,
             institutionId: metadata.institution.institution_id,
             institutionName: metadata.institution.name,
           });
-          
-          // Reset the link token so a new one is created for the next connection
-          setLinkToken(null);
         },
-        onExit: () => {
-          // Reset the link token when the user exits the flow
-          setLinkToken(null);
+        onExit: (err: any) => {
+          console.log("Plaid Link exit", err);
+          setIsLoading(false);
+          
+          if (err) {
+            toast({
+              title: "Link connection error",
+              description: err.error_message || "Error connecting to your bank",
+              variant: "destructive",
+            });
+          }
         },
         onEvent: (eventName: string) => {
-          // Optional: track events
-          console.log(`Plaid event: ${eventName}`);
+          console.log("Plaid Link event:", eventName);
         },
       });
 
       handler.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error opening Plaid Link:", error);
       toast({
         title: "Error opening Plaid Link",
-        description: "Please try again later",
+        description: error.message || "Please try again later",
         variant: "destructive",
       });
-      // Reset link token to get a fresh one next time
-      setLinkToken(null);
+      setIsLoading(false);
     }
   };
 
@@ -142,9 +148,9 @@ const PlaidLinkButton = ({
       onClick={openPlaidLink}
       className={className}
       variant={variant}
-      disabled={disabled || exchangeTokenMutation.isPending}
+      disabled={disabled || isLoading || exchangeTokenMutation.isPending}
     >
-      {exchangeTokenMutation.isPending ? (
+      {isLoading || exchangeTokenMutation.isPending ? (
         <>
           <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

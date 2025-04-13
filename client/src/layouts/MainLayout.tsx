@@ -15,8 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-// Import logo
+// Logo import
 import logoPath from "@/assets/logo.png";
 
 interface MainLayoutProps {
@@ -82,7 +81,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img src={logoPath} alt="WealthVision Logo" className="w-10 h-10 mr-2" />
+                <img src={logoPath} alt="WealthVision Logo" className="w-8 h-8 mr-2" />
                 <span className="font-bold text-white text-lg">WealthVision</span>
               </div>
               <div className="hidden sm:ml-8 sm:flex sm:space-x-6">

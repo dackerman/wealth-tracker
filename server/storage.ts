@@ -6,6 +6,8 @@ import {
   netWorthHistory, type NetWorthHistory, type InsertNetWorthHistory,
   plaidLinkTokens, type PlaidLinkToken, type InsertPlaidLinkToken
 } from "@shared/schema";
+import { db } from "./db";
+import { desc, eq, sql, and } from "drizzle-orm";
 
 export interface IStorage {
   // User methods
@@ -47,239 +49,229 @@ export interface IStorage {
   getLatestPlaidLinkToken(userId: number): Promise<PlaidLinkToken | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<number, User>;
-  private institutions: Map<number, Institution>;
-  private accounts: Map<number, Account>;
-  private transactions: Map<number, Transaction>;
-  private netWorthHistories: Map<number, NetWorthHistory>;
-  private plaidLinkTokens: Map<number, PlaidLinkToken>;
-  
-  private currentUserId: number;
-  private currentInstitutionId: number;
-  private currentAccountId: number;
-  private currentTransactionId: number;
-  private currentNetWorthHistoryId: number;
-  private currentPlaidLinkTokenId: number;
-
-  constructor() {
-    this.users = new Map();
-    this.institutions = new Map();
-    this.accounts = new Map();
-    this.transactions = new Map();
-    this.netWorthHistories = new Map();
-    this.plaidLinkTokens = new Map();
-    
-    this.currentUserId = 1;
-    this.currentInstitutionId = 1;
-    this.currentAccountId = 1;
-    this.currentTransactionId = 1;
-    this.currentNetWorthHistoryId = 1;
-    this.currentPlaidLinkTokenId = 1;
-
-    // Create a default user for testing
-    this.createUser({
-      username: "demo",
-      password: "password"
-    });
-  }
-
+export class DatabaseStorage implements IStorage {
   // User methods
   async getUser(id: number): Promise<User | undefined> {
-    return this.users.get(id);
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const id = this.currentUserId++;
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   // Institution methods
   async getInstitution(id: number): Promise<Institution | undefined> {
-    return this.institutions.get(id);
+    const [institution] = await db.select().from(institutions).where(eq(institutions.id, id));
+    return institution;
   }
 
   async getInstitutionsByUserId(userId: number): Promise<Institution[]> {
-    return Array.from(this.institutions.values()).filter(
-      (institution) => institution.userId === userId,
-    );
+    return db.select().from(institutions).where(eq(institutions.userId, userId));
   }
 
   async createInstitution(insertInstitution: InsertInstitution): Promise<Institution> {
-    const id = this.currentInstitutionId++;
-    const institution: Institution = { 
-      ...insertInstitution, 
-      id, 
-      lastUpdated: new Date() 
+    // Make sure all nullish fields are explicitly set to null rather than undefined
+    const institutionData = {
+      ...insertInstitution,
+      logoUrl: insertInstitution.logoUrl ?? null,
+      primaryColor: insertInstitution.primaryColor ?? null,
+      accessToken: insertInstitution.accessToken ?? null,
+      itemId: insertInstitution.itemId ?? null,
+      lastUpdated: new Date()
     };
-    this.institutions.set(id, institution);
+    
+    const [institution] = await db.insert(institutions).values(institutionData).returning();
     return institution;
   }
 
   async updateInstitution(id: number, institutionUpdate: Partial<Institution>): Promise<Institution | undefined> {
-    const institution = this.institutions.get(id);
-    if (!institution) return undefined;
-
-    const updatedInstitution: Institution = { 
-      ...institution, 
-      ...institutionUpdate,
-      lastUpdated: new Date()
-    };
-    this.institutions.set(id, updatedInstitution);
+    const [updatedInstitution] = await db.update(institutions)
+      .set({
+        ...institutionUpdate,
+        lastUpdated: new Date()
+      })
+      .where(eq(institutions.id, id))
+      .returning();
     return updatedInstitution;
   }
 
   async deleteInstitution(id: number): Promise<boolean> {
-    return this.institutions.delete(id);
+    const result = await db.delete(institutions).where(eq(institutions.id, id));
+    return !!result.rowCount;
   }
 
   // Account methods
   async getAccount(id: number): Promise<Account | undefined> {
-    return this.accounts.get(id);
+    const [account] = await db.select().from(accounts).where(eq(accounts.id, id));
+    return account;
   }
 
   async getAccountsByUserId(userId: number): Promise<Account[]> {
-    return Array.from(this.accounts.values()).filter(
-      (account) => account.userId === userId,
-    );
+    return db.select().from(accounts).where(eq(accounts.userId, userId));
   }
 
   async getAccountsByInstitutionId(institutionId: number): Promise<Account[]> {
-    return Array.from(this.accounts.values()).filter(
-      (account) => account.institutionId === institutionId,
-    );
+    return db.select().from(accounts).where(eq(accounts.institutionId, institutionId));
   }
 
   async createAccount(insertAccount: InsertAccount): Promise<Account> {
-    const id = this.currentAccountId++;
-    const account: Account = { 
-      ...insertAccount, 
-      id, 
+    // Make sure all nullish fields are explicitly set to null rather than undefined
+    const accountData = {
+      ...insertAccount,
+      officialName: insertAccount.officialName ?? null,
+      subtype: insertAccount.subtype ?? null,
+      mask: insertAccount.mask ?? null,
+      availableBalance: insertAccount.availableBalance ?? null,
+      limit: insertAccount.limit ?? null,
+      isoCurrencyCode: insertAccount.isoCurrencyCode ?? null,
       lastUpdated: new Date()
     };
-    this.accounts.set(id, account);
+    
+    const [account] = await db.insert(accounts).values(accountData).returning();
     return account;
   }
 
   async updateAccount(id: number, accountUpdate: Partial<Account>): Promise<Account | undefined> {
-    const account = this.accounts.get(id);
-    if (!account) return undefined;
-
-    const updatedAccount: Account = { 
-      ...account, 
-      ...accountUpdate,
-      lastUpdated: new Date()
-    };
-    this.accounts.set(id, updatedAccount);
+    const [updatedAccount] = await db.update(accounts)
+      .set({
+        ...accountUpdate,
+        lastUpdated: new Date()
+      })
+      .where(eq(accounts.id, id))
+      .returning();
     return updatedAccount;
   }
 
   async deleteAccount(id: number): Promise<boolean> {
-    return this.accounts.delete(id);
+    const result = await db.delete(accounts).where(eq(accounts.id, id));
+    return !!result.rowCount;
   }
 
   // Transaction methods
   async getTransaction(id: number): Promise<Transaction | undefined> {
-    return this.transactions.get(id);
+    const [transaction] = await db.select().from(transactions).where(eq(transactions.id, id));
+    return transaction;
   }
 
   async getTransactionsByUserId(userId: number, limit?: number): Promise<Transaction[]> {
-    const userTransactions = Array.from(this.transactions.values())
-      .filter((transaction) => transaction.userId === userId)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    // Get all records first
+    const allTransactions = await db.select().from(transactions)
+      .where(eq(transactions.userId, userId))
+      .orderBy(desc(transactions.date));
     
-    return limit ? userTransactions.slice(0, limit) : userTransactions;
+    // Apply limit if needed
+    if (limit !== undefined) {
+      return allTransactions.slice(0, limit);
+    }
+    return allTransactions;
   }
 
   async getTransactionsByAccountId(accountId: number, limit?: number): Promise<Transaction[]> {
-    const accountTransactions = Array.from(this.transactions.values())
-      .filter((transaction) => transaction.accountId === accountId)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    // Get all records first
+    const allTransactions = await db.select().from(transactions)
+      .where(eq(transactions.accountId, accountId))
+      .orderBy(desc(transactions.date));
     
-    return limit ? accountTransactions.slice(0, limit) : accountTransactions;
+    // Apply limit if needed
+    if (limit !== undefined) {
+      return allTransactions.slice(0, limit);
+    }
+    return allTransactions;
   }
 
   async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
-    const id = this.currentTransactionId++;
-    const transaction: Transaction = { ...insertTransaction, id };
-    this.transactions.set(id, transaction);
+    // Make sure all nullish fields are explicitly set to null rather than undefined
+    const transactionData = {
+      ...insertTransaction,
+      merchantName: insertTransaction.merchantName ?? null,
+      isoCurrencyCode: insertTransaction.isoCurrencyCode ?? null,
+      category: insertTransaction.category ?? null,
+      pending: insertTransaction.pending ?? null,
+      accountOwner: insertTransaction.accountOwner ?? null,
+      paymentChannel: insertTransaction.paymentChannel ?? null
+    };
+    
+    const [transaction] = await db.insert(transactions).values(transactionData).returning();
     return transaction;
   }
 
   async createTransactions(insertTransactions: InsertTransaction[]): Promise<Transaction[]> {
-    const createdTransactions: Transaction[] = [];
-    
-    for (const insertTransaction of insertTransactions) {
-      const transaction = await this.createTransaction(insertTransaction);
-      createdTransactions.push(transaction);
+    if (insertTransactions.length === 0) {
+      return [];
     }
     
-    return createdTransactions;
+    return db.insert(transactions).values(insertTransactions).returning();
   }
 
   async updateTransaction(id: number, transactionUpdate: Partial<Transaction>): Promise<Transaction | undefined> {
-    const transaction = this.transactions.get(id);
-    if (!transaction) return undefined;
-
-    const updatedTransaction: Transaction = { 
-      ...transaction, 
-      ...transactionUpdate
-    };
-    this.transactions.set(id, updatedTransaction);
+    const [updatedTransaction] = await db.update(transactions)
+      .set(transactionUpdate)
+      .where(eq(transactions.id, id))
+      .returning();
     return updatedTransaction;
   }
 
   async deleteTransaction(id: number): Promise<boolean> {
-    return this.transactions.delete(id);
+    const result = await db.delete(transactions).where(eq(transactions.id, id));
+    return !!result.rowCount;
   }
 
   // NetWorth history methods
   async getNetWorthHistory(id: number): Promise<NetWorthHistory | undefined> {
-    return this.netWorthHistories.get(id);
+    const [history] = await db.select().from(netWorthHistory).where(eq(netWorthHistory.id, id));
+    return history;
   }
 
   async getNetWorthHistoryByUserId(userId: number, limit?: number): Promise<NetWorthHistory[]> {
-    const netWorthHistories = Array.from(this.netWorthHistories.values())
-      .filter((history) => history.userId === userId)
-      .sort((a, b) => b.date.getTime() - a.date.getTime());
+    // Get all records first
+    const allHistory = await db.select().from(netWorthHistory)
+      .where(eq(netWorthHistory.userId, userId))
+      .orderBy(desc(netWorthHistory.date));
     
-    return limit ? netWorthHistories.slice(0, limit) : netWorthHistories;
+    // Apply limit if needed
+    if (limit !== undefined) {
+      return allHistory.slice(0, limit);
+    }
+    return allHistory;
   }
 
   async createNetWorthHistory(insertNetWorthHistory: InsertNetWorthHistory): Promise<NetWorthHistory> {
-    const id = this.currentNetWorthHistoryId++;
-    const netWorthHistory: NetWorthHistory = { ...insertNetWorthHistory, id };
-    this.netWorthHistories.set(id, netWorthHistory);
-    return netWorthHistory;
+    // Make sure all required fields are present and nullish fields are explicitly set to null
+    const historyData = {
+      ...insertNetWorthHistory,
+      date: insertNetWorthHistory.date ?? new Date(),
+      assetsBreakdown: insertNetWorthHistory.assetsBreakdown ?? null,
+      liabilitiesBreakdown: insertNetWorthHistory.liabilitiesBreakdown ?? null
+    };
+    
+    const [history] = await db.insert(netWorthHistory).values(historyData).returning();
+    return history;
   }
 
   // Plaid Link Token methods
   async createPlaidLinkToken(insertLinkToken: InsertPlaidLinkToken): Promise<PlaidLinkToken> {
-    const id = this.currentPlaidLinkTokenId++;
-    const linkToken: PlaidLinkToken = { 
-      ...insertLinkToken, 
-      id, 
-      createdAt: new Date() 
-    };
-    this.plaidLinkTokens.set(id, linkToken);
+    const [linkToken] = await db.insert(plaidLinkTokens).values({
+      ...insertLinkToken,
+      createdAt: new Date()
+    }).returning();
     return linkToken;
   }
 
   async getLatestPlaidLinkToken(userId: number): Promise<PlaidLinkToken | undefined> {
-    const userTokens = Array.from(this.plaidLinkTokens.values())
-      .filter((token) => token.userId === userId)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    const [token] = await db.select().from(plaidLinkTokens)
+      .where(eq(plaidLinkTokens.userId, userId))
+      .orderBy(desc(plaidLinkTokens.createdAt))
+      .limit(1);
     
-    return userTokens.length > 0 ? userTokens[0] : undefined;
+    return token;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();

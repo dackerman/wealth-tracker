@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2, Eye, EyeOff, Lock, User } from "lucide-react";
 import logoPath from "@/assets/logo.png";
+import logoHorizontalPath from "@/assets/logo-horizontal.png";
 
 // Create validation schemas for login and registration
 const loginSchema = insertUserSchema.pick({
@@ -50,10 +51,9 @@ export default function AuthPage() {
       <div className="flex flex-col justify-center items-center p-8">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center mb-8">
-            <div className="flex justify-center mb-3">
-              <img src={logoPath} alt="WealthVision Logo" className="w-16 h-16" />
+            <div className="flex justify-center mb-4">
+              <img src={logoHorizontalPath} alt="WealthVision Logo" className="h-14" />
             </div>
-            <h1 className="text-3xl font-bold wealth-gradient-text">WealthVision</h1>
             <p className="text-[var(--wealth-slate)] mt-2">
               Your financial future, clearly in sight
             </p>

@@ -16,8 +16,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Import logo
+// Import logos
 import logoPath from "@/assets/logo.png";
+import logoHorizontalPath from "@/assets/logo-horizontal.png";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -82,8 +83,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img src={logoPath} alt="WealthVision Logo" className="w-10 h-10 mr-2" />
-                <span className="font-bold text-white text-lg">WealthVision</span>
+                <img src={logoHorizontalPath} alt="WealthVision Logo" className="h-8" />
               </div>
               <div className="hidden sm:ml-8 sm:flex sm:space-x-6">
                 <Link href="/" className={`${
@@ -180,7 +180,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         
         {/* Mobile menu */}
         <div className={`sm:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`} id="mobile-menu">
-          <div className="pt-2 pb-3 space-y-0.5 border-t border-[var(--wealth-teal)]">
+          <div className="px-4 py-2 border-t border-[var(--wealth-teal)] flex justify-center">
+            <img src={logoPath} alt="WealthVision Logo" className="h-10 w-10" />
+          </div>
+          <div className="pb-3 space-y-0.5">
             <Link 
               href="/" 
               className={`${

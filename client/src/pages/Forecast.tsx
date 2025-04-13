@@ -527,6 +527,7 @@ export default function ForecastPage() {
   const hasShortfall = retirementShortfall > 0;
 
   return (
+    <TooltipProvider>
       <div className="space-y-8">
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -862,21 +863,21 @@ export default function ForecastPage() {
                               </div>
                               
                               <div className="flex items-center gap-1">
-                                <UITooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button 
-                                      variant="ghost" 
-                                      size="icon" 
-                                      className="h-8 w-8"
-                                      onClick={() => loadScenario(scenario.id)}
-                                    >
-                                      <FileSearch className="h-4 w-4" />
-                                    </Button>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    <p>Load Scenario</p>
-                                  </TooltipContent>
-                                </UITooltip>
+                                                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <Button 
+                                        variant="ghost" 
+                                        size="icon" 
+                                        className="h-8 w-8"
+                                        onClick={() => loadScenario(scenario.id)}
+                                      >
+                                        <FileSearch className="h-4 w-4" />
+                                      </Button>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      <p>Load Scenario</p>
+                                    </TooltipContent>
+                                  </Tooltip>
 
                                 <UITooltip>
                                   <TooltipTrigger asChild>
@@ -1581,5 +1582,6 @@ export default function ForecastPage() {
           </TabsContent>
         </Tabs>
       </div>
+    </TooltipProvider>
   );
 }

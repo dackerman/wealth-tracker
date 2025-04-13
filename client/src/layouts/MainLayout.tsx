@@ -16,7 +16,8 @@ import {
   ChevronDown,
   X,
   PlusCircle,
-  RefreshCcw
+  RefreshCcw,
+  TrendingUp
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -148,6 +149,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 >
                   <Target className="w-4 h-4 mr-1" />
                   Goals
+                </Link>
+                <Link
+                  href="/forecast"
+                  className={`${
+                    location === "/forecast"
+                      ? "border-[var(--wealth-light-teal)] text-white"
+                      : "border-transparent text-[var(--wealth-light-gray)] hover:border-[var(--wealth-light-gray)] hover:text-white"
+                  } inline-flex items-center px-2 pt-1 border-b-2 text-sm font-medium`}
+                >
+                  <TrendingUp className="w-4 h-4 mr-1" />
+                  Forecast
                 </Link>
               </div>
             </div>

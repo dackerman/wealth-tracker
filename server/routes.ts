@@ -53,6 +53,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: error.message || "Failed to create link token" });
     }
   });
+  
+  // Add a manual account
+  app.post("/api/accounts/manual", requireAuth, async (req, res) => {
+    try {
+      const schema = z.object({
+        institutionName: z.string().min(1),
+        accountName: z.string().min(1),
+        accountType: z.string().min(1),
+        balance: z.number().min(0),
+        isLiability: z.boolean().default(false),
+      });
+      
+      const validatedData = schema.parse(req.body);
+      const { institutionName, accountName, accountType, balance, isLiability } = validatedData;
+      
+      // First, check if the institution exists for this user
+      const existingInstitutions = await storage.getInstitutionsByUserId(req.body.userId);
+      let institution = existingInstitutions.find(i => 
+        i.name.toLowerCase() === institutionName.toLowerCase() && !i.plaidInstitutionId
+      );
+      
+      // If not, create a new manual institution
+      if (!institution) {
+        institution = await storage.createInstitution({
+          name: institutionName,
+          plaidInstitutionId: '', // Empty for manual institutions
+          userId: req.body.userId,
+          logoUrl: null,
+          primaryColor: null,
+          accessToken: null,
+          itemId: null,
+        });
+      }
+      
+      // Create the account
+      const account = await storage.createAccount({
+        plaidAccountId: `manual-${Date.now()}`, // Create a unique ID for manual accounts
+        institutionId: institution.id,
+        userId: req.body.userId,
+        name: accountName,
+        officialName: null,
+        type: accountType,
+        subtype: null,
+        mask: null,
+        currentBalance: isLiability ? -balance.toString() : balance.toString(), // Store as string, negative for liabilities
+        availableBalance: isLiability ? -balance.toString() : balance.toString(),
+        limit: null,
+        isoCurrencyCode: 'USD',
+      });
+      
+      // Calculate and store updated net worth
+      await updateNetWorth(req.body.userId);
+      
+      res.status(201).json({ success: true, account });
+    } catch (error: any) {
+      console.error("Error adding manual account:", error);
+      res.status(500).json({ error: error.message || "Failed to add manual account" });
+    }
+  });
 
   // Exchange a public token for an access token
   app.post("/api/plaid/exchange-public-token", requireAuth, async (req, res) => {

@@ -234,9 +234,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}
           id="mobile-menu"
         >
-          <div className="px-4 py-4 border-t border-[var(--wealth-teal)]">
+          <div className="px-2 py-2 border-t border-[var(--wealth-teal)]">
             {/* Mobile Logo Section */}
-            <div className="flex justify-center py-2 mb-2">
+            <div className="flex justify-center py-0">
               <img
                 src={logoMatrixPath}
                 alt="WealthVision Logo"
@@ -245,7 +245,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
             
             {/* User and Close Button */}
-            <div className="flex justify-between items-center py-2">
+            <div className="flex justify-between items-center py-1">
               <div className="text-white font-medium">
                 {user.username}
               </div>
@@ -259,7 +259,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </div>
           </div>
 
-          <div className="pb-3 space-y-0.5">
+          <div className="pb-1 space-y-0.5">
             {/* Navigation Links */}
             <Link
               href="/"
@@ -267,7 +267,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 location === "/"
                   ? "bg-[var(--wealth-teal)] border-[var(--wealth-light-teal)] text-white"
                   : "border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white"
-              } block pl-3 pr-4 py-2 border-l-4 text-base font-medium flex items-center`}
+              } block pl-3 pr-4 py-1 border-l-4 text-base font-medium flex items-center`}
             >
               <BarChart3 className="w-4 h-4 mr-2" />
               Dashboard
@@ -278,7 +278,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 location === "/accounts"
                   ? "bg-[var(--wealth-teal)] border-[var(--wealth-light-teal)] text-white"
                   : "border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white"
-              } block pl-3 pr-4 py-2 border-l-4 text-base font-medium flex items-center`}
+              } block pl-3 pr-4 py-1 border-l-4 text-base font-medium flex items-center`}
             >
               <Wallet className="w-4 h-4 mr-2" />
               Accounts
@@ -289,7 +289,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 location === "/transactions"
                   ? "bg-[var(--wealth-teal)] border-[var(--wealth-light-teal)] text-white"
                   : "border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white"
-              } block pl-3 pr-4 py-2 border-l-4 text-base font-medium flex items-center`}
+              } block pl-3 pr-4 py-1 border-l-4 text-base font-medium flex items-center`}
             >
               <ArrowUpDown className="w-4 h-4 mr-2" />
               Transactions
@@ -300,7 +300,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 location === "/goals"
                   ? "bg-[var(--wealth-teal)] border-[var(--wealth-light-teal)] text-white"
                   : "border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white"
-              } block pl-3 pr-4 py-2 border-l-4 text-base font-medium flex items-center`}
+              } block pl-3 pr-4 py-1 border-l-4 text-base font-medium flex items-center`}
             >
               <Target className="w-4 h-4 mr-2" />
               Goals
@@ -310,7 +310,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             <div className="border-t border-[var(--wealth-teal)]/50 pt-2 mt-2">
               <button
                 onClick={openModal}
-                className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-1 border-l-4 text-base font-medium"
               >
                 <PlusCircle className="h-4 w-4 mr-2" />
                 Add Account
@@ -319,7 +319,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <button
                 onClick={handleRefresh}
                 disabled={refreshMutation.isPending}
-                className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-1 border-l-4 text-base font-medium"
               >
                 <RefreshCcw className={`h-4 w-4 mr-2 ${refreshMutation.isPending ? "animate-spin" : ""}`} />
                 Refresh Data
@@ -327,7 +327,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               
               <button
                 onClick={handleLogout}
-                className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-2 border-l-4 text-base font-medium"
+                className="border-transparent text-[var(--wealth-light-gray)] hover:bg-[var(--wealth-teal)]/70 hover:text-white w-full text-left flex items-center pl-3 pr-4 py-1 border-l-4 text-base font-medium"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 Log Out

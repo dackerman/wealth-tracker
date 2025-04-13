@@ -1,8 +1,21 @@
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { formatDate, formatCurrency } from "@/lib/utils";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import MainLayout from "@/layouts/MainLayout";
 import {
@@ -62,7 +75,6 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { formatCurrency } from "@/lib/utils";
 import { 
   Info, 
   TrendingUp, 
@@ -76,9 +88,13 @@ import {
   Trash2,
   ArrowUpDown,
   Edit3,
+  Edit2,
   Copy,
   Save,
-  BarChart3
+  BarChart3,
+  FileSearch,
+  DollarSign,
+  CalendarDays
 } from "lucide-react";
 import { 
   LineChart, 
@@ -838,7 +854,11 @@ export default function ForecastPage() {
                                   </div>
                                   <div className="flex items-center text-muted-foreground">
                                     <DollarSign className="h-3 w-3 mr-1" />
-                                    {formatCurrency(scenario.formValues.currentSavings, { notation: 'compact' })}
+                                    {new Intl.NumberFormat('en-US', {
+                                      style: 'currency',
+                                      currency: 'USD',
+                                      notation: 'compact'
+                                    }).format(scenario.formValues.currentSavings)}
                                   </div>
                                   <div className="flex items-center text-muted-foreground">
                                     <CalendarDays className="h-3 w-3 mr-1" />

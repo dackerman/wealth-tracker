@@ -1,6 +1,7 @@
-import { pgTable, text, serial, integer, boolean, timestamp, numeric, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, numeric, json, foreignKey, primaryKey } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
 
 // User model
 export const users = pgTable("users", {
@@ -16,6 +17,15 @@ export const insertUserSchema = createInsertSchema(users).pick({
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Define user relations
+export const usersRelations = relations(users, ({ many }) => ({
+  institutions: many(institutions),
+  accounts: many(accounts),
+  transactions: many(transactions),
+  netWorthHistory: many(netWorthHistory),
+  plaidLinkTokens: many(plaidLinkTokens),
+}));
 
 // Financial Institution model
 export const institutions = pgTable("institutions", {
@@ -42,6 +52,15 @@ export const insertInstitutionSchema = createInsertSchema(institutions).pick({
 
 export type InsertInstitution = z.infer<typeof insertInstitutionSchema>;
 export type Institution = typeof institutions.$inferSelect;
+
+// Define institution relations
+export const institutionsRelations = relations(institutions, ({ one, many }) => ({
+  user: one(users, {
+    fields: [institutions.userId],
+    references: [users.id],
+  }),
+  accounts: many(accounts),
+}));
 
 // Account model
 export const accounts = pgTable("accounts", {
@@ -79,6 +98,19 @@ export const insertAccountSchema = createInsertSchema(accounts).pick({
 export type InsertAccount = z.infer<typeof insertAccountSchema>;
 export type Account = typeof accounts.$inferSelect;
 
+// Define account relations
+export const accountsRelations = relations(accounts, ({ one, many }) => ({
+  user: one(users, {
+    fields: [accounts.userId],
+    references: [users.id],
+  }),
+  institution: one(institutions, {
+    fields: [accounts.institutionId],
+    references: [institutions.id],
+  }),
+  transactions: many(transactions),
+}));
+
 // Transaction model
 export const transactions = pgTable("transactions", {
   id: serial("id").primaryKey(),
@@ -114,6 +146,18 @@ export const insertTransactionSchema = createInsertSchema(transactions).pick({
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 
+// Define transaction relations
+export const transactionsRelations = relations(transactions, ({ one }) => ({
+  user: one(users, {
+    fields: [transactions.userId],
+    references: [users.id],
+  }),
+  account: one(accounts, {
+    fields: [transactions.accountId],
+    references: [accounts.id],
+  }),
+}));
+
 // NetWorth history model - for tracking changes over time
 export const netWorthHistory = pgTable("net_worth_history", {
   id: serial("id").primaryKey(),
@@ -139,6 +183,14 @@ export const insertNetWorthHistorySchema = createInsertSchema(netWorthHistory).p
 export type InsertNetWorthHistory = z.infer<typeof insertNetWorthHistorySchema>;
 export type NetWorthHistory = typeof netWorthHistory.$inferSelect;
 
+// Define netWorthHistory relations
+export const netWorthHistoryRelations = relations(netWorthHistory, ({ one }) => ({
+  user: one(users, {
+    fields: [netWorthHistory.userId],
+    references: [users.id],
+  }),
+}));
+
 // PlaidLinkToken - to store temporarily generated link tokens
 export const plaidLinkTokens = pgTable("plaid_link_tokens", {
   id: serial("id").primaryKey(),
@@ -156,3 +208,11 @@ export const insertPlaidLinkTokenSchema = createInsertSchema(plaidLinkTokens).pi
 
 export type InsertPlaidLinkToken = z.infer<typeof insertPlaidLinkTokenSchema>;
 export type PlaidLinkToken = typeof plaidLinkTokens.$inferSelect;
+
+// Define plaidLinkToken relations
+export const plaidLinkTokensRelations = relations(plaidLinkTokens, ({ one }) => ({
+  user: one(users, {
+    fields: [plaidLinkTokens.userId],
+    references: [users.id],
+  }),
+}));

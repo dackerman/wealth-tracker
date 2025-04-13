@@ -17,7 +17,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 
-import MainLayout from "@/layouts/MainLayout";
+
 import {
   Card,
   CardContent,
@@ -527,7 +527,6 @@ export default function ForecastPage() {
   const hasShortfall = retirementShortfall > 0;
 
   return (
-    <MainLayout>
       <div className="space-y-8">
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -1582,6 +1581,5 @@ export default function ForecastPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </MainLayout>
   );
 }

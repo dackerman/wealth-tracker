@@ -1,7 +1,7 @@
 # WealthVision - Your Financial Future, Clearly in Sight
 
 <p align="center">
-  <img src="client/src/assets/logo-horizontal.png" alt="WealthVision Logo" width="400"/>
+  <img src="client/src/assets/logo-matrix.png" alt="WealthVision Logo" width="400"/>
 </p>
 
 ## 📈 Overview

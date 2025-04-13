@@ -83,7 +83,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
-                <img src={logoHorizontalPath} alt="WealthVision Logo" className="h-8" />
+                <img src={logoHorizontalPath} alt="WealthVision Logo" className="h-12" />
               </div>
               <div className="hidden sm:ml-8 sm:flex sm:space-x-6">
                 <Link href="/" className={`${

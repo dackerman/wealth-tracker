@@ -92,14 +92,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Desktop Header */}
       <nav className="wealth-gradient-bg text-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
+          <div className="flex justify-between h-24">
             {/* Logo section - visible on all screens */}
             <div className="flex items-center">
               <div className="flex-shrink-0 flex items-center">
                 <img
                   src={logoMatrixPath}
                   alt="WealthVision Logo"
-                  className="h-12"
+                  className="h-20"
                 />
               </div>
               
@@ -234,7 +234,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           className={`md:hidden ${isMobileMenuOpen ? "block" : "hidden"}`}
           id="mobile-menu"
         >
-          <div className="px-4 py-2 border-t border-[var(--wealth-teal)]">
+          <div className="px-4 py-4 border-t border-[var(--wealth-teal)]">
+            {/* Mobile Logo Section */}
+            <div className="flex justify-center py-2 mb-2">
+              <img
+                src={logoMatrixPath}
+                alt="WealthVision Logo"
+                className="h-24"
+              />
+            </div>
+            
+            {/* User and Close Button */}
             <div className="flex justify-between items-center py-2">
               <div className="text-white font-medium">
                 {user.username}

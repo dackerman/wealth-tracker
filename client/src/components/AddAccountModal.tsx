@@ -227,11 +227,31 @@ const AddAccountModal = ({ isOpen, onClose }: AddAccountModalProps) => {
                 <FormField
                   control={form.control}
                   name="balance"
-                  render={({ field }) => (
+                  render={({ field: { onChange, value, ...rest } }) => (
                     <FormItem>
                       <FormLabel>Current Balance</FormLabel>
                       <FormControl>
-                        <Input type="number" min="0" step="0.01" placeholder="0.00" {...field} />
+                        <div className="relative">
+                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                            $
+                          </div>
+                          <Input 
+                            {...rest}
+                            className="pl-7"
+                            type="text" 
+                            placeholder="0.00"
+                            value={value ? parseFloat(value).toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            }) : ''}
+                            onChange={(e) => {
+                              // Remove non-numeric characters for processing
+                              const rawValue = e.target.value.replace(/[^0-9.]/g, '');
+                              // Update the form value
+                              onChange(rawValue);
+                            }}
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

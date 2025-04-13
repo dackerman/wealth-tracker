@@ -87,25 +87,17 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 <span className="font-bold text-gray-900 text-lg">Wealth Tracker</span>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                <Link href="/">
-                  <a className={`${location === '/' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                    Dashboard
-                  </a>
+                <Link href="/" className={`${location === '/' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                  Dashboard
                 </Link>
-                <Link href="/accounts">
-                  <a className={`${location === '/accounts' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                    Accounts
-                  </a>
+                <Link href="/accounts" className={`${location === '/accounts' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                  Accounts
                 </Link>
-                <Link href="/transactions">
-                  <a className={`${location === '/transactions' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                    Transactions
-                  </a>
+                <Link href="/transactions" className={`${location === '/transactions' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                  Transactions
                 </Link>
-                <Link href="/goals">
-                  <a className={`${location === '/goals' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
-                    Goals
-                  </a>
+                <Link href="/goals" className={`${location === '/goals' ? 'border-primary text-gray-900' : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'} inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}>
+                  Goals
                 </Link>
               </div>
             </div>
@@ -168,25 +160,29 @@ const MainLayout = ({ children }: MainLayoutProps) => {
         {/* Mobile menu */}
         <div className={`sm:hidden ${isMobileMenuOpen ? 'block' : 'hidden'}`} id="mobile-menu">
           <div className="pt-2 pb-3 space-y-1">
-            <Link href="/">
-              <a className={`${location === '/' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}>
-                Dashboard
-              </a>
+            <Link 
+              href="/" 
+              className={`${location === '/' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+            >
+              Dashboard
             </Link>
-            <Link href="/accounts">
-              <a className={`${location === '/accounts' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}>
-                Accounts
-              </a>
+            <Link 
+              href="/accounts" 
+              className={`${location === '/accounts' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+            >
+              Accounts
             </Link>
-            <Link href="/transactions">
-              <a className={`${location === '/transactions' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}>
-                Transactions
-              </a>
+            <Link 
+              href="/transactions" 
+              className={`${location === '/transactions' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+            >
+              Transactions
             </Link>
-            <Link href="/goals">
-              <a className={`${location === '/goals' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}>
-                Goals
-              </a>
+            <Link 
+              href="/goals" 
+              className={`${location === '/goals' ? 'bg-primary bg-opacity-10 border-primary text-primary' : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800'} block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+            >
+              Goals
             </Link>
             <button
               onClick={handleLogout}

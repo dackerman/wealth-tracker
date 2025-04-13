@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from "@/components/ui/card";
 import {
   Form,
@@ -44,15 +45,48 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Tooltip as UITooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatCurrency } from "@/lib/utils";
-import { Info, TrendingUp, Wallet, Landmark, ArrowUp, ArrowDown, PiggyBank, Gift } from "lucide-react";
+import { 
+  Info, 
+  TrendingUp, 
+  Wallet, 
+  Landmark, 
+  ArrowUp, 
+  ArrowDown, 
+  PiggyBank, 
+  Gift,
+  PlusCircle,
+  Trash2,
+  ArrowUpDown,
+  Edit3,
+  Copy,
+  Save,
+  BarChart3
+} from "lucide-react";
 import { 
   LineChart, 
   Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
-  Tooltip, 
+  Tooltip as ChartTooltip, 
   Legend, 
   ResponsiveContainer,
   AreaChart,
@@ -301,9 +335,40 @@ interface NetWorthSummary {
   totalLiabilities: string;
 }
 
+// Create a scenario type
+interface RetirementScenario {
+  id: string;
+  name: string;
+  description?: string;
+  formValues: ForecastFormValues;
+  calculatedData: any;
+  color: string;
+  createdAt: Date;
+}
+
+// Colors for scenarios
+const scenarioColors = [
+  "#0ea5e9", // sky-500
+  "#14b8a6", // teal-500
+  "#a855f7", // purple-500
+  "#f59e0b", // amber-500
+  "#ec4899", // pink-500
+  "#84cc16", // lime-500
+  "#ef4444", // red-500
+  "#06b6d4", // cyan-500
+];
+
 export default function ForecastPage() {
   const [forecastData, setForecastData] = useState<any | null>(null);
   const [activeTab, setActiveTab] = useState("calculator");
+  
+  // Add state for scenarios
+  const [scenarios, setScenarios] = useState<RetirementScenario[]>([]);
+  const [activeScenarioId, setActiveScenarioId] = useState<string | null>(null);
+  const [isScenarioModalOpen, setIsScenarioModalOpen] = useState(false);
+  const [scenarioName, setScenarioName] = useState("");
+  const [scenarioDescription, setScenarioDescription] = useState("");
+  const [isComparisonMode, setIsComparisonMode] = useState(false);
 
   // Define the form with default values first
   const form = useForm<ForecastFormValues>({

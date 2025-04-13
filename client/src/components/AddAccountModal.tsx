@@ -227,35 +227,57 @@ const AddAccountModal = ({ isOpen, onClose }: AddAccountModalProps) => {
                 <FormField
                   control={form.control}
                   name="balance"
-                  render={({ field: { onChange, value, ...rest } }) => (
-                    <FormItem>
-                      <FormLabel>Current Balance</FormLabel>
-                      <FormControl>
-                        <div className="relative">
-                          <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-                            $
+                  render={({ field: { onChange, onBlur: fieldOnBlur, value, ...rest } }) => {
+                    // Track if the field is being edited
+                    const [isEditing, setIsEditing] = useState(false);
+                    
+                    // Format the number for display (only when not editing)
+                    const formattedValue = !isEditing && value 
+                      ? parseFloat(value).toLocaleString('en-US', {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2
+                        }) 
+                      : value;
+                    
+                    return (
+                      <FormItem>
+                        <FormLabel>Current Balance</FormLabel>
+                        <FormControl>
+                          <div className="relative">
+                            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
+                              $
+                            </div>
+                            <Input 
+                              {...rest}
+                              className="pl-7"
+                              type="text" 
+                              placeholder="0.00"
+                              value={formattedValue}
+                              onFocus={() => setIsEditing(true)} 
+                              onBlur={(e) => {
+                                setIsEditing(false);
+                                fieldOnBlur(e);
+                              }}
+                              onChange={(e) => {
+                                // Only process when editing
+                                if (isEditing) {
+                                  // Allow only numbers and decimal point
+                                  const rawValue = e.target.value.replace(/[^0-9.]/g, '');
+                                  
+                                  // Validate decimal format (prevent multiple decimal points)
+                                  const decimalCount = (rawValue.match(/\./g) || []).length;
+                                  if (decimalCount <= 1) {
+                                    onChange(rawValue);
+                                  }
+                                }
+                              }}
+                            />
                           </div>
-                          <Input 
-                            {...rest}
-                            className="pl-7"
-                            type="text" 
-                            placeholder="0.00"
-                            value={value ? parseFloat(value).toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            }) : ''}
-                            onChange={(e) => {
-                              // Remove non-numeric characters for processing
-                              const rawValue = e.target.value.replace(/[^0-9.]/g, '');
-                              // Update the form value
-                              onChange(rawValue);
-                            }}
-                          />
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
                 />
 
                 <FormField

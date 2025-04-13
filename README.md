@@ -1,7 +1,9 @@
 # WealthVision - Your Financial Future, Clearly in Sight
 
 <p align="center">
-  <img src="client/src/assets/logo-matrix.png" alt="WealthVision Logo" width="400"/>
+  <img src="client/src/assets/hero-image.png" alt="WealthVision Hero" width="100%"/>
+  <br>
+  <em>Envision your financial future with WealthVision - where humans and AI work together for prosperity</em>
 </p>
 
 ## 📈 Overview
@@ -161,7 +163,10 @@ WealthVision is designed to work beautifully on all devices:
 - Touch-friendly UI elements
 - Consistent experience across devices
 
-## 📸 Application Screenshots
+## 📸 Application Experience
+
+### Futuristic Vision
+As showcased in our hero image, WealthVision presents a future where financial management seamlessly integrates with daily life. The image depicts users in a lush, green cityscape interfacing with holographic financial data visualizations while AI assistants provide support - representing our vision of making financial management both intuitive and forward-thinking.
 
 ### Modern Authentication Interface
 The WealthVision login experience provides a clean, professional interface with secure authentication.

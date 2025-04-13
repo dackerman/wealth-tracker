@@ -5,7 +5,6 @@ import { useAuth } from "@/hooks/use-auth";
 import AddAccountModal from "@/components/AddAccountModal";
 import { apiRequest } from "@/lib/queryClient";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { MobileMenu } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu, LogOut, UserCircle } from "lucide-react";
 import {

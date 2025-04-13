@@ -11,13 +11,23 @@ import {
   getTransactions,
 } from "./plaid";
 import { insertAccountSchema, insertInstitutionSchema, insertTransactionSchema } from "@shared/schema";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Common middleware to check if user is authenticated
-  // In a real app, you would use a proper auth system
+  // Set up authentication
+  setupAuth(app);
+  
+  // Middleware to check if user is authenticated
   const requireAuth = (req: Request, res: Response, next: Function) => {
-    // For demo purposes, we're using a fixed user ID
-    req.body.userId = 1;
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+    
+    // Add userId to body for convenience in route handlers
+    if (req.user) {
+      req.body.userId = req.user.id;
+    }
+    
     next();
   };
 

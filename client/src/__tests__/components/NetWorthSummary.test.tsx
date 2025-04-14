@@ -1,7 +1,7 @@
 import { formatCurrency } from '../../lib/utils';
 
-// Skip this suite for now until we fix the Jest React setup
-describe.skip('NetWorthSummary Component', () => {
+// Jest React setup has been fixed - running tests now
+describe('NetWorthSummary Component', () => {
   // Test utility functions that the component would use
   describe('Currency formatting', () => {
     it('should format currency values correctly', () => {

@@ -1,7 +1,7 @@
 import { ForecastFormValues, defaultValues, calculateForecastData } from '../../components/forecast-calculator';
 
-// Skip the full component tests until we fix Jest configuration for JSX
-describe.skip('Forecast Form', () => {
+// Jest configuration for JSX has been fixed - running tests now
+describe('Forecast Form', () => {
   // Test the forecast calculator functionality instead
   describe('Retirement calculation logic', () => {
     it('should calculate retirement target based on expenses and withdrawal rate', () => {

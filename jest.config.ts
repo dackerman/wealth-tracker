@@ -1,20 +1,18 @@
-import type { Config } from 'jest';
+import type { Config } from '@jest/types';
 
-const config: Config = {
+const config: Config.InitialOptions = {
+  preset: 'ts-jest',
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/client/src', '<rootDir>/server'],
+  setupFilesAfterEnv: ['./jest.setup.ts'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/client/src/$1',
-    '^@assets/(.*)$': '<rootDir>/client/src/assets/$1',
-    '^@shared/(.*)$': '<rootDir>/shared/$1',
     '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js',
+    '^@/(.*)$': '<rootDir>/client/src/$1',
+    '^@shared/(.*)$': '<rootDir>/shared/$1',
+    '^@assets/(.*)$': '<rootDir>/client/src/assets/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
-  testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
+  modulePaths: ['<rootDir>'],
   transform: {
-    // Use swc-jest for React component tests
-    '^.+\\.(tsx)$': ['@swc/jest', {
+    '^.+\\.(ts|tsx)$': ['@swc/jest', {
       jsc: {
         parser: {
           syntax: 'typescript',
@@ -27,23 +25,16 @@ const config: Config = {
         },
       },
     }],
-    // Use ts-jest for server-side TypeScript files
-    '^.+\\.ts$': ['ts-jest', { 
-      isolatedModules: true 
-    }]
   },
   transformIgnorePatterns: [
-    '/node_modules/(?!(@replit|@radix-ui|cmdk|wouter|rehype|remark|unified|bail|trough|vfile|unist|hast|hastscript|property-information|space-separated-tokens|comma-separated-tokens|micromark|character-entities|decode-named-character-reference|trim-lines)/).+\\.js$'
+    '/node_modules/(?!.*\\.(js|jsx|ts|tsx)$)',
   ],
-  collectCoverageFrom: [
-    'client/src/**/*.{ts,tsx}',
-    'server/**/*.{ts,tsx}',
-    '!**/*.d.ts',
-    '!**/node_modules/**',
-  ],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  // Add a timeout of 30 seconds for tests
-  testTimeout: 30000,
+  testPathIgnorePatterns: ['/node_modules/', '/.replit/'],
+  globals: {
+    'ts-jest': {
+      isolatedModules: true,
+    },
+  },
 };
 
 export default config;

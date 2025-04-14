@@ -14,13 +14,12 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      useESM: true,
-      isolatedModules: true,
-      jsx: 'react-jsx',
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: {
+        jsx: 'react-jsx',
+      },
     }],
   },
-  extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transformIgnorePatterns: [
     '/node_modules/(?!(@replit|@radix-ui|cmdk|wouter|rehype|remark|unified|bail|trough|vfile|unist|hast|hastscript|property-information|space-separated-tokens|comma-separated-tokens|micromark|character-entities|decode-named-character-reference|trim-lines)/).+\\.js$'
   ],

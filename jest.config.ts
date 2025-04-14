@@ -1,7 +1,6 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest',
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/client/src', '<rootDir>/server'],
   moduleNameMapper: {
@@ -14,10 +13,23 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   transform: {
-    // Use ts-jest for all TypeScript and TypeScript JSX files
-    '^.+\\.(ts|tsx)$': ['ts-jest', { 
-      isolatedModules: true,
-      jsx: 'react-jsx'
+    // Use swc-jest for React component tests
+    '^.+\\.(tsx)$': ['@swc/jest', {
+      jsc: {
+        parser: {
+          syntax: 'typescript',
+          tsx: true,
+        },
+        transform: {
+          react: {
+            runtime: 'automatic',
+          },
+        },
+      },
+    }],
+    // Use ts-jest for server-side TypeScript files
+    '^.+\\.ts$': ['ts-jest', { 
+      isolatedModules: true 
     }]
   },
   transformIgnorePatterns: [

@@ -3,6 +3,11 @@
 // expect(element).toHaveTextContent(/react/i)
 // learn more: https://github.com/testing-library/jest-dom
 import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
+// Polyfill TextEncoder and TextDecoder for Node.js environment
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
 
 // Mock window.matchMedia which is not available in Jest
 Object.defineProperty(window, 'matchMedia', {

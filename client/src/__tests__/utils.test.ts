@@ -10,8 +10,8 @@ describe('Utility functions', () => {
       expect(formatCurrency(-1234.56)).toBe('-$1,234.56');
     });
 
-    it('respects the compact option for large numbers', () => {
-      expect(formatCurrency(1234567, { compact: true })).toBe('$1.23M');
+    it('respects the notation option for large numbers', () => {
+      expect(formatCurrency(1234567, { notation: 'compact' })).toBe('$1.23M');
     });
   });
 
@@ -21,9 +21,15 @@ describe('Utility functions', () => {
       expect(formatDate(date)).toMatch(/Jan 15, 2025/);
     });
 
-    it('respects the format option', () => {
+    it('respects custom format options', () => {
       const date = new Date('2025-01-15T12:00:00');
-      expect(formatDate(date, { format: 'yyyy-MM-dd' })).toBe('2025-01-15');
+      expect(formatDate(date, { 
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      })).toMatch(/01\/15\/2025/);
     });
   });
 

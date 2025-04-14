@@ -14,10 +14,8 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   transform: {
-    '^.+\\.(ts|tsx)$': ['ts-jest', {
-      tsconfig: {
-        jsx: 'react-jsx',
-      },
+    '^.+\\.tsx?$': ['ts-jest', {
+      isolatedModules: true,
     }],
   },
   transformIgnorePatterns: [

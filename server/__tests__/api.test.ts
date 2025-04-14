@@ -1,6 +1,6 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import request from 'supertest';
-import { MockStorage } from './mocks/utils/mockStorage';
+import { MockStorage } from '../../server/lib/test-utils/mockStorage';
 import { User, Institution, Account, Transaction, NetWorthHistory } from '@shared/schema';
 
 // Mock data for testing

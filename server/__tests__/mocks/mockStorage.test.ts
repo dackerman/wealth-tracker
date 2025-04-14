@@ -1,4 +1,4 @@
-import { MockStorage } from './utils/mockStorage';
+import { MockStorage } from '../../../server/lib/test-utils/mockStorage';
 
 describe('MockStorage', () => {
   let storage: MockStorage;

@@ -253,8 +253,11 @@ function CurrencyInput({
   useEffect(() => {
     // Format when value changes externally
     if (value !== undefined && value !== null && !isEditing) {
-      // Format with commas for displaying
-      setDisplayValue(value.toLocaleString('en-US'));
+      // Format with commas and 2 decimal places for displaying
+      setDisplayValue(value.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }));
     }
   }, [value, isEditing]);
 
@@ -282,7 +285,10 @@ function CurrencyInput({
     if (displayValue) {
       const numValue = parseFloat(displayValue);
       if (!isNaN(numValue)) {
-        setDisplayValue(numValue.toLocaleString('en-US'));
+        setDisplayValue(numValue.toLocaleString('en-US', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }));
       }
     }
   };

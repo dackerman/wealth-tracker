@@ -1,0 +1,31 @@
+import type { Config } from 'jest';
+
+const config: Config = {
+  preset: 'ts-jest',
+  testEnvironment: 'jsdom',
+  roots: ['<rootDir>/client/src', '<rootDir>/server'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/client/src/$1',
+    '^@assets/(.*)$': '<rootDir>/client/src/assets/$1',
+    '^@shared/(.*)$': '<rootDir>/shared/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+    '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/__mocks__/fileMock.js',
+  },
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  transformIgnorePatterns: [
+    '/node_modules/(?!(@replit|@radix-ui|cmdk|wouter|rehype|remark|unified|bail|trough|vfile|unist|hast|hastscript|property-information|space-separated-tokens|comma-separated-tokens|micromark|character-entities|decode-named-character-reference|trim-lines)/).+\\.js$'
+  ],
+  collectCoverageFrom: [
+    'client/src/**/*.{ts,tsx}',
+    'server/**/*.{ts,tsx}',
+    '!**/*.d.ts',
+    '!**/node_modules/**',
+  ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+};
+
+export default config;

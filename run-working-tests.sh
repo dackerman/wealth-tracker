@@ -1,2 +1,0 @@
-#!/bin/bash
-NODE_ENV=test npx jest --config=jest.config.ts --no-cache --verbose client/src/__tests__/basic.test.ts client/src/__tests__/forecast-calculator.basic.test.ts client/src/__tests__/forecast-calculator.test.ts

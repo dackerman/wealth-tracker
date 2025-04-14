@@ -68,7 +68,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Tooltip as UITooltip,
+  Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
@@ -879,7 +879,7 @@ export default function ForecastPage() {
                                     </TooltipContent>
                                   </Tooltip>
 
-                                <UITooltip>
+                                <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button 
                                       variant="ghost" 
@@ -893,9 +893,9 @@ export default function ForecastPage() {
                                   <TooltipContent>
                                     <p>Edit Scenario</p>
                                   </TooltipContent>
-                                </UITooltip>
+                                </Tooltip>
 
-                                <UITooltip>
+                                <Tooltip>
                                   <TooltipTrigger asChild>
                                     <Button 
                                       variant="ghost" 
@@ -909,9 +909,9 @@ export default function ForecastPage() {
                                   <TooltipContent>
                                     <p>Duplicate Scenario</p>
                                   </TooltipContent>
-                                </UITooltip>
+                                </Tooltip>
 
-                                <UITooltip>
+                                <Tooltip>
                                   <TooltipTrigger asChild>
                                     <AlertDialog>
                                       <AlertDialogTrigger asChild>
@@ -946,7 +946,7 @@ export default function ForecastPage() {
                                   <TooltipContent>
                                     <p>Delete Scenario</p>
                                   </TooltipContent>
-                                </UITooltip>
+                                </Tooltip>
                               </div>
                             </div>
                             {isComparisonMode && (

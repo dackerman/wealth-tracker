@@ -1,1 +1,2 @@
-NODE_ENV=test npx jest --testTimeout=30000 client/src/__tests__/utils.test.ts
+#!/bin/bash
+NODE_ENV=test npx jest --config=jest.config.ts --no-cache --verbose

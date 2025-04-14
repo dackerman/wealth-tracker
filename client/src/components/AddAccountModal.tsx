@@ -35,7 +35,6 @@ const manualAccountSchema = z.object({
   balance: z.string().refine(val => !isNaN(Number(val)) && Number(val) >= 0, {
     message: "Balance must be a valid positive number",
   }),
-  isLiability: z.boolean().default(false),
 });
 
 type ManualAccountValues = z.infer<typeof manualAccountSchema>;
@@ -53,18 +52,20 @@ const AddAccountModal = ({ isOpen, onClose }: AddAccountModalProps) => {
       accountName: "",
       accountType: "depository",
       balance: "",
-      isLiability: false,
     },
   });
 
   const manualAccountMutation = useMutation({
     mutationFn: async (values: ManualAccountValues) => {
+      // Determine if the account is a liability based on its type
+      const isLiability = ['credit', 'loan'].includes(values.accountType);
+      
       return apiRequest('POST', '/api/accounts/manual', {
         institutionName: values.institutionName,
         accountName: values.accountName,
         accountType: values.accountType,
         balance: Number(values.balance),
-        isLiability: values.isLiability,
+        isLiability,
       });
     },
     onSuccess: () => {
@@ -280,26 +281,15 @@ const AddAccountModal = ({ isOpen, onClose }: AddAccountModalProps) => {
                   }}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="isLiability"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
-                      <div className="space-y-0.5">
-                        <FormLabel>Is this a liability?</FormLabel>
-                        <FormDescription className="text-xs text-muted-foreground">
-                          Turn on if this is a debt like a loan or credit card
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+                {/* Account type description */}
+                <div className="rounded-lg border p-4 mt-2 mb-2">
+                  <p className="text-sm text-muted-foreground mb-1">
+                    <strong>Note:</strong> Credit Card and Loan accounts are automatically treated as liabilities.
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Depository (checking/savings), Investment, and Property accounts are treated as assets.
+                  </p>
+                </div>
 
                 <DialogFooter>
                   <Button

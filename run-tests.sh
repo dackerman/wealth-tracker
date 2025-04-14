@@ -26,6 +26,8 @@ function show_usage {
   echo "  -u, --utils       Run only utility tests"
   echo "  -f, --forecast    Run only forecast calculator tests"
   echo "  -b, --basic       Run only basic tests (utils + forecast)"
+  echo "  -c, --components  Run only component tests"
+  echo "  -h, --hooks       Run only hook tests"
   echo ""
   echo "Examples:"
   echo "  ./run-tests.sh                    # Run all tests"

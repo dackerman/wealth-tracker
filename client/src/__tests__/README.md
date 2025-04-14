@@ -1,66 +1,72 @@
-# WealthVision Testing Documentation
+# WealthVision Testing Guide
 
-## Testing Structure
+This document outlines our testing approach and provides guidelines for writing resilient tests that won't break with UI changes.
 
-The WealthVision application uses Jest for unit and integration testing. This directory contains test files for various parts of the application.
+## Test Organization
 
-### Test Categories
+Tests are organized into the following categories:
 
-1. **Utility Tests** - Tests for helper functions like formatters and calculators
-   - `basic.test.ts` - Tests for common utility functions like date and currency formatting
-   - `forecast-calculator.test.ts` - Tests for the retirement forecast calculation logic
+1. **Unit Tests**: Test individual functions in isolation
+   - Located in the root of `__tests__` directory (e.g., `basic.test.ts`)
+   - Focus on pure functions with well-defined inputs and outputs
 
-2. **Component Tests** - Tests for React components
-   - Located in the `components/` directory
-   - Tests component rendering and behavior
+2. **Component Tests**: Test React components with mocked dependencies
+   - Located in `__tests__/components` directory
+   - Use react-testing-library patterns
 
-3. **Hook Tests** - Tests for custom React hooks
-   - Located in the `hooks/` directory
-   - Tests hook behavior and state management
+3. **Hook Tests**: Test custom React hooks
+   - Located in `__tests__/hooks` directory
+   - Use renderHook from react-testing-library
+
+## Best Practices for UI-Resilient Tests
+
+To ensure tests don't break when UI changes:
+
+1. **Use data-testid attributes** instead of relying on class names, element types, or DOM structure
+   - Good: `screen.getByTestId('net-worth-value')`
+   - Avoid: `screen.getByText('Net Worth').closest('div').querySelector('.amount')`
+
+2. **Test behavior, not implementation**
+   - Focus on what the component does, not how it's built
+   - Test that data is displayed correctly, not the exact HTML structure
+
+3. **Use mock components** that mirror the behavior but simplify the implementation
+   - Create simplified versions of complex components for testing
+   - Focus on the core data and functionality
+
+4. **Avoid snapshot tests** for UI components that change frequently
+   - Snapshots break easily with minor UI updates
+   - Use explicit assertions instead
 
 ## Running Tests
 
-Use the main test runner script at the project root:
+Use our test runner script to execute tests:
 
 ```bash
 # Run all tests
 ./run-tests.sh
 
+# Run only basic tests
+./run-tests.sh -b
+
+# Run only component tests
+./run-tests.sh -c
+
 # Run with verbose output
 ./run-tests.sh -v
 
-# Run only utility tests
-./run-tests.sh -u
-
-# Run only forecast calculator tests
-./run-tests.sh -f
-
-# Run tests with coverage report
-./run-tests.sh -c
-
-# See all options
-./run-tests.sh -h
+# Run a specific test file
+./run-tests.sh path/to/test.ts
 ```
 
-## Test Best Practices
+## Testing Data
 
-1. **Keep tests isolated** - Each test should be independent and not rely on the state of other tests
-2. **Use descriptive test names** - Clear test names help with debugging
-3. **Test edge cases** - Include tests for boundary conditions and error handling
-4. **Aim for good coverage** - Try to test all critical paths in the code
-5. **Mock external dependencies** - Use Jest mocks for API calls and other external dependencies
+- Use realistic but simplified test data
+- Avoid hardcoding large datasets in test files
+- For component tests, use mock data that resembles the shape of real data
 
-## Test Configuration
+## Mocking Dependencies
 
-The Jest configuration is in `jest.config.ts` at the project root. It's set up to work with:
-
-- TypeScript
-- React
-- ES modules
-- CSS modules
-- Static assets (images, etc.)
-
-The global test setup is in `jest.setup.ts` at the project root, which configures:
-
-- DOM testing utilities
-- Mocks for browser APIs not available in the test environment
+- Use mock functions (`jest.fn()`) for external dependencies
+- For API calls, use MSW (Mock Service Worker) to intercept and mock responses
+- When testing hooks that use context, provide a test wrapper that includes all required providers

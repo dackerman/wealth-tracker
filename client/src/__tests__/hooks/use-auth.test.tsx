@@ -3,8 +3,70 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { http, HttpResponse } from 'msw';
-import { setupServer } from 'msw/node';
+
+// Mock HTTP responses
+class HttpResponse {
+  body: any;
+  status: number;
+  headers: Record<string, string>;
+
+  constructor(body: any, options?: { status?: number, headers?: Record<string, string> }) {
+    this.body = body;
+    this.status = options?.status || 200;
+    this.headers = options?.headers || {};
+  }
+
+  static json(data: any, options?: { status?: number, headers?: Record<string, string> }) {
+    return new HttpResponse(JSON.stringify(data), options);
+  }
+}
+
+// Simple mock server
+const http = {
+  get: (url: string, handler: () => HttpResponse) => ({ url, method: 'GET', handler }),
+  post: (url: string, handler: (args: any) => HttpResponse) => ({ url, method: 'POST', handler })
+};
+
+const setupServer = (...handlers: any[]) => {
+  const server = {
+    handlers,
+    originalHandlers: [...handlers],
+    listen: () => {},
+    resetHandlers: () => { server.handlers = [...server.originalHandlers] },
+    close: () => {},
+    use: (...newHandlers: any[]) => { server.handlers = [...newHandlers, ...server.handlers] }
+  };
+  
+  // Mock fetch globally
+  global.fetch = async (url: string, options?: RequestInit) => {
+    const method = options?.method || 'GET';
+    const matchingHandler = server.handlers.find(h => h.url === url && h.method === method);
+    
+    if (matchingHandler) {
+      const response = matchingHandler.handler({ 
+        request: { 
+          json: async () => options?.body ? JSON.parse(options.body as string) : {}
+        } 
+      });
+      
+      return {
+        ok: response.status >= 200 && response.status < 300,
+        status: response.status,
+        text: async () => typeof response.body === 'string' ? response.body : JSON.stringify(response.body),
+        json: async () => typeof response.body === 'string' ? JSON.parse(response.body) : response.body
+      } as Response;
+    }
+    
+    return {
+      ok: false,
+      status: 404,
+      text: async () => 'Not Found',
+      json: async () => ({ error: 'Not Found' })
+    } as Response;
+  };
+  
+  return server;
+};
 
 // Mock user data
 const mockUser = {

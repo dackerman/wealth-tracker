@@ -1,7 +1,6 @@
 import type { Config } from 'jest';
 
 const config: Config = {
-  preset: 'ts-jest',
   testEnvironment: 'jsdom',
   roots: ['<rootDir>/client/src', '<rootDir>/server'],
   moduleNameMapper: {
@@ -14,9 +13,7 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testMatch: ['**/__tests__/**/*.ts?(x)', '**/?(*.)+(spec|test).ts?(x)'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', {
-      isolatedModules: true,
-    }],
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel.config.js' }]
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(@replit|@radix-ui|cmdk|wouter|rehype|remark|unified|bail|trough|vfile|unist|hast|hastscript|property-information|space-separated-tokens|comma-separated-tokens|micromark|character-entities|decode-named-character-reference|trim-lines)/).+\\.js$'

@@ -11,8 +11,8 @@ describe('NetWorthSummary Component', () => {
     });
     
     it('should handle compact notation for large numbers when specified', () => {
-      expect(formatCurrency(1500000, { notation: 'compact' })).toBe('$1.5M');
-      expect(formatCurrency(2500000000, { notation: 'compact' })).toBe('$2.5B');
+      expect(formatCurrency(1500000, { notation: 'compact' })).toBe('$1.50M');
+      expect(formatCurrency(2500000000, { notation: 'compact' })).toBe('$2.50B');
     });
   });
   

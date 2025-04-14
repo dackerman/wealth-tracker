@@ -248,28 +248,42 @@ function CurrencyInput({
   [key: string]: any;
 }) {
   const [displayValue, setDisplayValue] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     // Format when value changes externally
-    if (value !== undefined && value !== null) {
-      setDisplayValue(value.toString());
+    if (value !== undefined && value !== null && !isEditing) {
+      // Format with commas for displaying
+      setDisplayValue(value.toLocaleString('en-US'));
     }
-  }, [value]);
+  }, [value, isEditing]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove commas for editing
+    const rawInput = e.target.value.replace(/,/g, '');
+    
     // Accept only numbers and decimals during typing
-    const inputVal = e.target.value;
-    if (inputVal === "" || /^[0-9]*\.?[0-9]*$/.test(inputVal)) {
-      setDisplayValue(inputVal);
-      onChange(inputVal === "" ? 0 : parseFloat(inputVal));
+    if (rawInput === "" || /^[0-9]*\.?[0-9]*$/.test(rawInput)) {
+      setDisplayValue(rawInput);
+      onChange(rawInput === "" ? 0 : parseFloat(rawInput));
     }
   };
 
+  const handleFocus = () => {
+    // When focused, show unformatted number for editing
+    setIsEditing(true);
+    setDisplayValue(value.toString());
+  };
+
   const handleBlur = () => {
-    // Format nicely on blur
+    setIsEditing(false);
+    
+    // Format nicely on blur if we have a value
     if (displayValue) {
       const numValue = parseFloat(displayValue);
-      setDisplayValue(numValue.toString());
+      if (!isNaN(numValue)) {
+        setDisplayValue(numValue.toLocaleString('en-US'));
+      }
     }
   };
 
@@ -280,6 +294,7 @@ function CurrencyInput({
         type="text"
         value={displayValue}
         onChange={handleChange}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         className="pl-8"
         placeholder={placeholder}
@@ -303,13 +318,15 @@ function PercentageInput({
   [key: string]: any;
 }) {
   const [displayValue, setDisplayValue] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     // Format when value changes externally
-    if (value !== undefined && value !== null) {
+    if (value !== undefined && value !== null && !isEditing) {
+      // For percentage inputs, we keep the format simpler
       setDisplayValue(value.toString());
     }
-  }, [value]);
+  }, [value, isEditing]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Accept only numbers and decimals during typing
@@ -320,11 +337,21 @@ function PercentageInput({
     }
   };
 
+  const handleFocus = () => {
+    // When focused, show unformatted number for editing
+    setIsEditing(true);
+    setDisplayValue(value.toString());
+  };
+
   const handleBlur = () => {
-    // Format nicely on blur
+    setIsEditing(false);
+    
+    // Format nicely on blur if we have a value
     if (displayValue) {
       const numValue = parseFloat(displayValue);
-      setDisplayValue(numValue.toString());
+      if (!isNaN(numValue)) {
+        setDisplayValue(numValue.toString());
+      }
     }
   };
 
@@ -334,6 +361,7 @@ function PercentageInput({
         type="text"
         value={displayValue}
         onChange={handleChange}
+        onFocus={handleFocus}
         onBlur={handleBlur}
         className="pr-8"
         placeholder={placeholder}

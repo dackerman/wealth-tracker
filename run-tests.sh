@@ -22,18 +22,20 @@ function show_usage {
   echo "  -h, --help        Show this help message"
   echo "  -v, --verbose     Run tests with verbose output"
   echo "  -w, --watch       Run tests in watch mode"
-  echo "  -c, --coverage    Run tests with coverage report"
+  echo "  --coverage        Run tests with coverage report"
   echo "  -u, --utils       Run only utility tests"
   echo "  -f, --forecast    Run only forecast calculator tests"
   echo "  -b, --basic       Run only basic tests (utils + forecast)"
-  echo "  -c, --components  Run only component tests"
-  echo "  -h, --hooks       Run only hook tests"
+  echo "  -p, --components  Run only component tests"
+  echo "  -k, --hooks       Run only hook tests"
   echo ""
   echo "Examples:"
   echo "  ./run-tests.sh                    # Run all tests"
   echo "  ./run-tests.sh -v                 # Run all tests with verbose output"
-  echo "  ./run-tests.sh -c                 # Run all tests with coverage report"
+  echo "  ./run-tests.sh --coverage         # Run all tests with coverage report"
   echo "  ./run-tests.sh -u                 # Run only utility tests"
+  echo "  ./run-tests.sh -p                 # Run only component tests"
+  echo "  ./run-tests.sh -b -v              # Run basic tests with verbose output"
   echo "  ./run-tests.sh client/src/utils   # Run tests matching 'client/src/utils'"
   echo ""
 }
@@ -59,7 +61,7 @@ while [[ $# -gt 0 ]]; do
       WATCH="--watch"
       shift
       ;;
-    -c|--coverage)
+    --coverage)
       COVERAGE="--coverage"
       shift
       ;;
@@ -73,6 +75,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     -b|--basic)
       TEST_PATTERN="client/src/__tests__/basic.test.ts client/src/__tests__/forecast-calculator.basic.test.ts"
+      shift
+      ;;
+    -p|--components)
+      TEST_PATTERN="client/src/__tests__/components"
+      shift
+      ;;
+    -k|--hooks)
+      TEST_PATTERN="client/src/__tests__/hooks"
       shift
       ;;
     *)

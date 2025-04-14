@@ -17,6 +17,7 @@ const config: Config = {
     '^.+\\.tsx?$': ['ts-jest', {
       useESM: true,
       isolatedModules: true,
+      jsx: 'react-jsx',
     }],
   },
   extensionsToTreatAsEsm: ['.ts', '.tsx'],

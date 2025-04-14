@@ -1,6 +1,6 @@
 import express, { Express } from 'express';
 import request from 'supertest';
-import { MockStorage } from './mocks/mockStorage';
+import { MockStorage } from './mocks/utils/mockStorage';
 import { scrypt, randomBytes } from 'crypto';
 import { promisify } from 'util';
 

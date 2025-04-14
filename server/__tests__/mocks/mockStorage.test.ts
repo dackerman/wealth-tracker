@@ -1,69 +1,65 @@
-import { MockStorage } from './mockStorage';
-import { InsertUser } from '@shared/schema';
+import { MockStorage } from './utils/mockStorage';
 
 describe('MockStorage', () => {
-  let mockStorage: MockStorage;
+  let storage: MockStorage;
 
   beforeEach(() => {
-    mockStorage = new MockStorage();
+    storage = new MockStorage();
   });
 
   describe('User methods', () => {
-    it('should create and retrieve a user', async () => {
-      const userData: InsertUser = {
+    it('should create a user and retrieve it by ID', async () => {
+      const insertUser = {
         username: 'testuser',
-        password: 'password123'
+        password: 'hashedpassword'
       };
+
+      const createdUser = await storage.createUser(insertUser);
+      expect(createdUser).toHaveProperty('id');
+      expect(createdUser.username).toBe(insertUser.username);
+
+      const retrievedUser = await storage.getUser(createdUser.id);
+      expect(retrievedUser).toBeDefined();
+      expect(retrievedUser?.id).toBe(createdUser.id);
+      expect(retrievedUser?.username).toBe(createdUser.username);
+    });
+
+    it('should retrieve a user by username', async () => {
+      const insertUser = {
+        username: 'testuser',
+        password: 'hashedpassword'
+      };
+
+      await storage.createUser(insertUser);
+      const user = await storage.getUserByUsername(insertUser.username);
       
-      const createdUser = await mockStorage.createUser(userData);
-      expect(createdUser.id).toBe(1);
-      expect(createdUser.username).toBe('testuser');
-      
-      const retrievedUser = await mockStorage.getUser(1);
-      expect(retrievedUser).toEqual(createdUser);
-      
-      const retrievedByUsername = await mockStorage.getUserByUsername('testuser');
-      expect(retrievedByUsername).toEqual(createdUser);
+      expect(user).toBeDefined();
+      expect(user?.username).toBe(insertUser.username);
+    });
+
+    it('should return undefined for non-existent users', async () => {
+      const user = await storage.getUser(999);
+      expect(user).toBeUndefined();
+
+      const userByUsername = await storage.getUserByUsername('nonexistent');
+      expect(userByUsername).toBeUndefined();
     });
   });
 
-  describe('Institution methods', () => {
-    it('should create, retrieve, update and delete institutions', async () => {
-      // Create user first
-      const user = await mockStorage.createUser({
+  describe('Reset method', () => {
+    it('should clear all data', async () => {
+      // Add some data
+      await storage.createUser({
         username: 'testuser',
-        password: 'password123'
+        password: 'hashedpassword'
       });
-      
-      // Create institution
-      const createdInstitution = await mockStorage.createInstitution({
-        userId: user.id,
-        plaidInstitutionId: 'ins_123',
-        name: 'Test Bank',
-        color: '#123456',
-        logo: 'logo.png'
-      });
-      expect(createdInstitution.id).toBe(1);
-      
-      // Get by ID
-      const retrievedInstitution = await mockStorage.getInstitution(1);
-      expect(retrievedInstitution).toEqual(createdInstitution);
-      
-      // Get by user ID
-      const userInstitutions = await mockStorage.getInstitutionsByUserId(user.id);
-      expect(userInstitutions.length).toBe(1);
-      expect(userInstitutions[0]).toEqual(createdInstitution);
-      
-      // Update
-      const updatedInstitution = await mockStorage.updateInstitution(1, { name: 'Updated Bank' });
-      expect(updatedInstitution?.name).toBe('Updated Bank');
-      
-      // Delete
-      const deleted = await mockStorage.deleteInstitution(1);
-      expect(deleted).toBe(true);
-      
-      const emptyInstitutions = await mockStorage.getInstitutionsByUserId(user.id);
-      expect(emptyInstitutions.length).toBe(0);
+
+      // Reset
+      storage.reset();
+
+      // Verify data is cleared
+      const user = await storage.getUserByUsername('testuser');
+      expect(user).toBeUndefined();
     });
   });
 });

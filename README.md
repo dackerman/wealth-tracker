@@ -34,6 +34,8 @@ What would have taken weeks or months with traditional development approaches wa
   
 - **Daily Data Synchronization**: Your financial data updates automatically every day to ensure you always have the most current information.
 
+- **Retirement Forecast**: Plan for your financial future using the built-in retirement calculator and scenario comparison tools.
+
 ## 🛠️ Technical Stack
 
 WealthVision is built with a modern, scalable tech stack:
@@ -44,6 +46,7 @@ WealthVision is built with a modern, scalable tech stack:
 - **Authentication**: Secure session-based authentication
 - **API Integration**: Plaid API for financial institution connectivity
 - **Data Visualization**: Recharts for beautiful, interactive charts
+- **Testing**: Jest and React Testing Library for unit and component testing
 
 ## 🚀 Getting Started
 
@@ -92,112 +95,65 @@ npm run dev
      - Password: `test`
    - Or create your own account by registering
 
+### Running Tests
+
+Tests have been implemented using Jest and React Testing Library. To run the test suite:
+
+```bash
+./run-tests.sh
+```
+
+The test suite includes:
+- Unit tests for utility functions
+- Component tests for UI elements
+- Integration tests for API endpoints
+- Mock implementations of database and external services
+
 ## 🧠 Technical Achievements
 
 The development of WealthVision showcases several impressive technical achievements:
 
 1. **Instant PostgreSQL Integration**: Seamlessly implemented a robust database layer with proper schema relations and migrations using Drizzle ORM.
 
-2. **Automated Background Jobs**: Created a sophisticated job scheduling system that runs daily to sync financial data and update net worth calculations.
+2. **Secure Authentication System**:
+   - Password hashing using scrypt with salting
+   - Protection against common vulnerabilities like CSRF, XSS, and session hijacking
+   - Proper session management with secure cookies
 
-3. **Secure Authentication**: Implemented a complete authentication system with secure password hashing, session management, and protected routes.
+3. **Advanced Financial Calculator**:
+   - Implementation of the 4% rule for retirement planning
+   - Monte Carlo simulation for probability of retirement success
+   - Scenario comparison tools for evaluating different financial paths
 
-4. **Financial API Integration**: Successfully connected to the Plaid API with proper error handling, credential management, and data synchronization.
+4. **Automated Background Jobs**:
+   - Daily synchronization of financial data
+   - Periodic net worth calculation
+   - Efficient task scheduling using node-cron
 
-5. **Production-Ready Architecture**: Built with scalability in mind, using proper separation of concerns, typed interfaces, and maintainable code patterns.
+5. **Responsive Design**:
+   - Fully responsive UI that works seamlessly on mobile, tablet, and desktop
+   - Dynamic layout adjustments based on viewport size
+   - Touch-friendly interfaces for mobile users
 
-All these features were implemented coherently and rapidly, demonstrating the power of modern development environments like Replit for building complex applications.
+6. **Testing Framework**:
+   - Comprehensive test suite with high code coverage
+   - Mock implementations for testing without external dependencies
+   - Component testing with React Testing Library
 
-## 💻 The Replit Experience
+## 📊 Visualizing Financial Progress
 
-Building WealthVision on Replit offered several unique advantages:
+WealthVision provides rich visualization tools for understanding your financial situation:
 
-- **Frictionless Development**: The integrated development environment eliminated setup overhead and configuration hassles.
-  
-- **Instant Deployment**: Testing and sharing the application was seamless with Replit's built-in hosting capabilities.
-  
-- **Collaborative Potential**: The platform's real-time collaboration features make it perfect for team development.
-  
-- **Comprehensive Tools**: Built-in database support, environment variable management, and deployment options streamlined the development process.
+- **Net Worth Chart**: Track how your wealth grows over time
+- **Asset Allocation**: Understand the distribution of your investments
+- **Spending Categories**: Visualize where your money goes
+- **Retirement Readiness**: See if you're on track for your retirement goals
 
-This project demonstrates how powerful Replit can be for rapidly developing full-stack applications with complex integrations and requirements.
+## 🔒 Security First
 
-## 📊 Application Structure
+Financial data is sensitive, which is why WealthVision prioritizes security:
 
-WealthVision follows a clean architecture pattern with clear separation of concerns:
-
-- **client/**: React frontend application
-  - **src/components/**: Reusable UI components
-  - **src/hooks/**: Custom React hooks
-  - **src/pages/**: Application pages
-  - **src/layouts/**: Page layouts and templates
-  - **src/lib/**: Utility functions and API client
-
-- **server/**: Express backend application
-  - **auth.ts**: Authentication logic
-  - **db.ts**: Database configuration
-  - **routes.ts**: API route definitions
-  - **storage.ts**: Data access layer
-  - **plaid.ts**: Plaid API integration
-  - **jobs.ts**: Background sync jobs
-
-- **shared/**: Code shared between client and server
-  - **schema.ts**: Database schema definitions
-
-## 🔒 Security
-
-WealthVision takes security seriously:
-
-- All data is transmitted over HTTPS
-- Plaid handles sensitive bank credentials - they are never stored in our database
-- Session-based authentication with secure cookies
-- Password hashing using scrypt with salting
-- Protection against common web vulnerabilities (XSS, CSRF, etc.)
-
-## 📱 Responsive Design
-
-WealthVision is designed to work beautifully on all devices:
-
-- Mobile-first approach
-- Responsive dashboard layouts
-- Touch-friendly UI elements
-- Consistent experience across devices
-
-## 📸 Application Experience
-
-### Futuristic Vision
-As showcased in our hero image, WealthVision presents a future where financial management seamlessly integrates with daily life. The image depicts users in a lush, green cityscape interfacing with holographic financial data visualizations while AI assistants provide support - representing our vision of making financial management both intuitive and forward-thinking.
-
-### Modern Authentication Interface
-The WealthVision login experience provides a clean, professional interface with secure authentication.
-
-### Dashboard Overview
-The main dashboard gives users a comprehensive view of their financial health, including net worth trends, account balances, and recent transactions.
-
-### Account Management
-Users can easily connect to financial institutions through Plaid or add manual accounts for complete flexibility.
-
-### Transaction Tracking
-Detailed transaction history allows users to monitor spending patterns and track financial activity across all accounts.
-
-## 🔮 Future Development
-
-WealthVision has a robust roadmap for continued development:
-
-- **Budget Tracking System**: Create and monitor budgets across different spending categories
-- **Financial Goal Calculators**: Tools to help plan for retirement, home purchases, and other major financial goals
-- **Investment Portfolio Analysis**: Detailed breakdowns of investment performance and asset allocation
-- **AI-Powered Insights**: Smart suggestions for optimizing spending and growing wealth
-- **Mobile Applications**: Native iOS and Android apps for on-the-go finance tracking
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## 📝 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-<p align="center">Built with ❤️ by the WealthVision Team</p>
+- **End-to-End Encryption**: All data in transit is encrypted using TLS
+- **Database Encryption**: Sensitive fields like access tokens are encrypted at rest
+- **OAuth Integration**: No need to store bank credentials
+- **Regular Security Updates**: Continuous monitoring and updates for dependencies
